@@ -108,7 +108,6 @@ set(LIBRARIES
         multisig
         daemonizer
         cncrypto
-        blocks
         lmdb
         ringct
         ringct_basic
@@ -119,7 +118,6 @@ set(LIBRARIES
         checkpoints
         version
         epee
-        pcsclite
         ${Boost_LIBRARIES}
         pthread
         unbound
