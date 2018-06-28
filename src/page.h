@@ -2431,7 +2431,7 @@ public:
                     for (const tx_destination_entry& a_dest: tx_cd.splitted_dsts)
                     {
                         mstch::map dest_info {
-                                {"dest_address"  , get_account_address_as_str(
+                                {"dest_address"  , get_public_address_as_str(
                                         nettype, a_dest.is_subaddress, a_dest.addr)},
                                 {"dest_amount"   , xmreg::xmr_amount_to_str(a_dest.amount)}
                         };
@@ -2775,7 +2775,7 @@ public:
 
                     destination_addresses.push_back(
                             mstch::map {
-                                    {"dest_address"   , get_account_address_as_str(
+                                    {"dest_address"   , get_public_address_as_str(
                                             nettype, a_dest.is_subaddress, a_dest.addr)},
                                     {"dest_amount"    , xmreg::xmr_amount_to_str(a_dest.amount)},
                                     {"is_this_change" , false}
@@ -2792,7 +2792,7 @@ public:
                 {
                     destination_addresses.push_back(
                             mstch::map {
-                                    {"dest_address"   , get_account_address_as_str(
+                                    {"dest_address"   , get_public_address_as_str(
                                             nettype, ptx.construction_data.change_dts.is_subaddress, ptx.construction_data.change_dts.addr)},
                                     {"dest_amount"    ,
                                             xmreg::xmr_amount_to_str(ptx.construction_data.change_dts.amount)},
@@ -3686,7 +3686,7 @@ public:
 
             address_parse_info address_info;
 
-            if (!get_account_address_from_str(address_info, nettype, search_text))
+            if (!get_account_address_from_str(nettype, address_info, search_text))
             {
                 cerr << "Cant parse string integerated address: " << search_text << endl;
                 return string("Cant parse address (probably incorrect format): ")

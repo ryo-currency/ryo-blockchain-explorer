@@ -81,7 +81,7 @@ parse_str_address(const string& address_str,
                   cryptonote::network_type nettype)
 {
 
-    if (!get_account_address_from_str(address_info, nettype, address_str))
+    if (!get_account_address_from_str(nettype, address_info, address_str))
     {
         cerr << "Error getting address: " << address_str << endl;
         return false;
@@ -97,7 +97,7 @@ parse_str_address(const string& address_str,
 string
 print_address(const address_parse_info& address_info, cryptonote::network_type nettype)
 {
-    return "<" + get_account_address_as_str(
+    return "<" + get_public_address_as_str(
             nettype, address_info.is_subaddress, address_info.address)
            + ">";
 }
@@ -180,7 +180,7 @@ timestamp_to_str_gm(time_t timestamp, const char* format)
 ostream&
 operator<< (ostream& os, const address_parse_info& addr_info)
 {
-    os << get_account_address_as_str(network_type::MAINNET, addr_info.is_subaddress, addr_info.address);
+    os << get_public_address_as_str<network_type::MAINNET>(addr_info.is_subaddress, addr_info.address);
     return os;
 }
 
