@@ -3440,7 +3440,7 @@ public:
                 reinterpret_cast<const account_public_address*>(
                         decoded_raw_data.data());
 
-        address_parse_info address_info {*xmr_address, false, false, crypto::null_hash8};
+        address_parse_info address_info {*xmr_address, false, false, false, crypto::null_hash8};
 
         context.insert({"address"        , REMOVE_HASH_BRAKETS(
                 xmreg::print_address(address_info, nettype))});
@@ -5258,7 +5258,7 @@ public:
                 {"last_git_commit_hash", string {GIT_COMMIT_HASH}},
                 {"last_git_commit_date", string {GIT_COMMIT_DATETIME}},
                 {"git_branch_name"     , string {GIT_BRANCH_NAME}},
-                {"monero_version_full" , string {MONERO_VERSION_FULL}},
+                {"monero_version_full" , string {RYO_VERSION_FULL}},
                 {"api"                 , ONIONEXPLORER_RPC_VERSION},
                 {"blockchain_height"   , core_storage->get_current_blockchain_height()}
         };
@@ -6321,7 +6321,7 @@ private:
                 {"last_git_commit_hash", string {GIT_COMMIT_HASH}},
                 {"last_git_commit_date", string {GIT_COMMIT_DATETIME}},
                 {"git_branch_name"     , string {GIT_BRANCH_NAME}},
-                {"monero_version_full" , string {MONERO_VERSION_FULL}},
+                {"monero_version_full" , string {RYO_VERSION_FULL}},
                 {"api"                 , std::to_string(ONIONEXPLORER_RPC_VERSION_MAJOR)
                                          + "."
                                          + std::to_string(ONIONEXPLORER_RPC_VERSION_MINOR)},
