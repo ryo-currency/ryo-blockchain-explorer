@@ -229,7 +229,7 @@ namespace crow
     private:
         uint16_t port_ = 80;
         uint16_t concurrency_ = 1;
-        std::string bindaddr_ = "0.0.0.0";
+        std::string bindaddr_ = "127.0.0.1";
         Router router_;
 
         std::chrono::milliseconds tick_interval_;
