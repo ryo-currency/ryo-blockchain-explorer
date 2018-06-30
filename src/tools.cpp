@@ -251,7 +251,7 @@ get_default_lmdb_folder(cryptonote::network_type nettype)
 
     // the default folder of the lmdb blockchain database
     // is therefore as follows
-    return default_monero_dir + string("/lmdb");
+    return default_monero_dir + string("/lmdb02");
 }
 
 
