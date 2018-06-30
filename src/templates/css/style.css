@@ -10,10 +10,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .center {
+	color:#313131;
     margin: auto;
     width: 96%;
     /*border: 1px solid #73AD21;
     padding: 10px;*/
+	
 }
 
 tr, li, #pages, .info {
@@ -29,26 +31,29 @@ tr, li, #pages, .info {
 
 td {
     text-align: center;
+    border: 2px solid #bbbbbb;
+    border-radius: 6px;
+    background: whitesmoke;
 }
 
 a:link {
-    text-decoration: none;
-    color: white;
+    text-decoration: underline;
+    color: #313131;
 }
 
 a:visited {
     text-decoration: none;
-    color: white;
+    color: #313131;
 }
 
 a:hover {
     text-decoration: underline;
-    color: white;
+    color: #313131;
 }
 
 a:active {
     text-decoration: none;
-    color: white;
+    color: #313131;
 }
 
 form {
@@ -79,6 +84,7 @@ form {
     float: left;
 }
 
+/*
 .tab label {
     background: black;
     padding: 10px;
@@ -87,11 +93,13 @@ form {
     position: relative;
     left: 1px;
 }
+*/
 
 .tab [type=radio] {
     display: none;
 }
 
+/*
 .content {
     position: absolute;
     top: 28px;
@@ -102,11 +110,14 @@ form {
     padding: 20px;
     border: 1px solid #ccc;
 }
+*/
 
 [type=radio]:checked ~ label {
-    background: #505050 ;
-    border-bottom: 1px solid white;
-    z-index: 2;
+    z-index: 3;
+    background: rgb(17, 180, 231);
+	background: rgb(65, 162, 245);
+	
+    margin-bottom: 28px;
 }
 
 [type=radio]:checked ~ label ~ .content {
@@ -138,4 +149,157 @@ div#decoded-inputs{
 /* Toggled State */
 input#toggle-1[type=checkbox]:checked ~ div#decoded-inputs {
     display: block;
+}
+
+
+/*addition*/
+
+/*
+body {
+    background: #171717;
+    color:white;
+}
+*/
+
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Saira', sans-serif;
+}
+
+body > div.center > table > tbody > tr > td > a {
+  display: inline-block;
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  margin: 0 0 15px;
+  padding: 8px 20px 10px;
+  border: 1px solid rgb(31,45,77);
+  border-top-color: rgb(56,83,140);
+  border-bottom-color: rgb(21,30,51);
+  -webkit-border-radius: 4px;
+  border-radius: 17px;
+  /*font: normal normal bold 14px/1 "Coda", Helvetica, sans-serif;*/
+  color: white;
+  font-weight:800;
+  text-align: center;
+  -o-text-overflow: clip;
+  text-overflow: clip;
+  background: rgba(43,202,255,1);
+  -webkit-box-shadow: 0 1px 10px 1px rgb(92,139,238) inset, 0 1px 0 0 rgb(29,44,77) , 0 6px 0 0 rgb(31,48,83) , 0 8px 4px 1px rgb(17,17,17) ;
+  box-shadow: 0 1px 10px 1px rgb(92,139,238) inset, 0 1px 0 0 rgb(29,44,77) , 0 6px 0 0 rgb(31,48,83) , 0 8px 4px 1px rgb(17,17,17) ;
+  text-shadow: 0 -1px 1px rgb(30,45,77) ;
+  text-decoration: none;
+  letter-spacing: 1px !important;
+}
+
+body > div.center > table > tbody > tr > td > a:hover {
+  cursor: pointer;
+  -webkit-box-shadow: 0 0 20px 1px rgb(135,173,255) inset, 0 1px 0 0 rgb(29,44,77) , 0 6px 0 0 rgb(31,48,83) , 0 8px 4px 1px rgb(17,17,17) ;
+  box-shadow: 0 0 20px 1px rgb(135,173,255) inset, 0 1px 0 0 rgb(29,44,77) , 0 6px 0 0 rgb(31,48,83) , 0 8px 4px 1px rgb(17,17,17) ;
+}
+
+body > div.center > table > tbody > tr > td > a:active {
+  margin: 5px 0 10px;
+  -webkit-box-shadow: 0 1px 10px 1px rgb(92,139,238) inset, 0 1px 0 0 rgb(29,44,77) , 0 2px 0 0 rgb(31,48,83) , 0 4px 3px 0 rgb(17,17,17) ;
+  box-shadow: 0 1px 10px 1px rgb(92,139,238) inset, 0 1px 0 0 rgb(29,44,77) , 0 2px 0 0 rgb(31,48,83) , 0 4px 3px 0 rgb(17,17,17) ;
+}
+
+/*
+body {
+    background: #7b7b7b;
+    color: black;
+}
+*/
+
+/*
+body {background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAYAAACp8Z5+AAAAI0lEQVQYV2P89OnT/2kn/zFkmTMxgGjGjt0f/sM4IJqRoAoAosYgExIhkAAAAAAASUVORK5CYII=) repeat;
+}
+*/
+
+.tab label {
+	font-family: 'Saira', sans-serif;
+    background: #929292;
+    color: #ffffff;
+    padding: 5px;
+	padding-left: 15px;
+    padding-right: 15px;
+    border: 1px solid #000;
+    margin-left: -1px;
+    position: relative;
+    left: 1px;
+    border-radius: 11px 11px 0 0;
+    border-bottom: 0px solid white !important;
+    padding-bottom: 11px;
+	text-shadow: 0 0 2px #5f5f5f;
+}
+
+
+@-moz-document url-prefix() { 
+	.tab label {
+	top:6px;
+	}
+}
+
+
+@-moz-document url-prefix() {
+    @supports (animation: calc(0s)) {
+        .tab label {
+	top:-4px;
+	}
+    }
+}
+
+
+body {
+height:100%;
+color: #313131;
+background: rgb(218, 218, 218);
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#f7fbfc+0,d9edf2+40,add9e4+100;Blue+3D+%231 */
+background: rgb(247,251,252); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(247,251,252,1) 0%, rgba(217,237,242,1) 40%, rgba(173,217,228,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(247,251,252,1) 0%,rgba(217,237,242,1) 40%,rgba(173,217,228,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f7fbfc', endColorstr='#add9e4',GradientType=0 ); /* IE6-9 */
+
+	
+}
+
+.content {
+	color: black !important;
+    position: absolute;
+    top: 24px;
+    left: 0;
+    background: #c7c7c7;
+    right: 0;
+    bottom: 0;
+    padding: 20px;
+    border: 1px solid #000;
+	background: rgba(43,202,255,1);
+    text-decoration: none;
+    letter-spacing: 1px !important;
+	
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#0fb4e7+0,a9e4f7+100 */
+background: rgb(15,180,231); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(15,180,231,1) 0%, rgba(169,228,247,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(15,180,231,1) 0%,rgba(169,228,247,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(15,180,231,1) 0%,rgba(169,228,247,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#0fb4e7', endColorstr='#a9e4f7',GradientType=0 ); /* IE6-9 */
+
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#41a2f5+0,a9e4f7+100 */
+background: rgb(65,162,245); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(65,162,245,1) 0%, rgba(169,228,247,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(65,162,245,1) 0%,rgba(169,228,247,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(65,162,245,1) 0%,rgba(169,228,247,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#41a2f5', endColorstr='#a9e4f7',GradientType=0 ); /* IE6-9 */
+
+/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#41a2f5+11,a9e4f7+100 */
+background: rgb(65,162,245); /* Old browsers */
+background: -moz-linear-gradient(top, rgba(65,162,245,1) 11%, rgba(169,228,247,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, rgba(65,162,245,1) 11%,rgba(169,228,247,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, rgba(65,162,245,1) 11%,rgba(169,228,247,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#41a2f5', endColorstr='#a9e4f7',GradientType=0 ); /* IE6-9 */
+
+
+
+    margin-bottom: -5px;
 }

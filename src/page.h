@@ -1546,7 +1546,7 @@ public:
 
         if (xmr_address_str.empty())
         {
-            return string("Monero address not provided!");
+            return string("Ryo address not provided!");
         }
 
         if (viewkey_str.empty())
@@ -1566,13 +1566,13 @@ public:
             return string("Cant get tx hash due to parse error: " + tx_hash_str);
         }
 
-        // parse string representing given monero address
+        // parse string representing given Ryo address
         cryptonote::address_parse_info address_info;
 
         if (!xmreg::parse_str_address(xmr_address_str,  address_info, nettype))
         {
             cerr << "Cant parse string address: " << xmr_address_str << endl;
-            return string("Cant parse xmr address: " + xmr_address_str);
+            return string("Cant parse Ryo address: " + xmr_address_str);
         }
 
         // parse string representing given private key
@@ -4778,7 +4778,7 @@ public:
         if (address_str.empty())
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Monero address not provided";
+            j_response["message"] = "Ryo address not provided";
             return j_response;
         }
 
@@ -4815,7 +4815,7 @@ public:
         if (!xmreg::parse_str_address(address_str,  address_info, nettype))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse monero address: " + address_str;
+            j_response["message"] = "Cant parse Ryo address: " + address_str;
             return j_response;
 
         }
@@ -5003,7 +5003,7 @@ public:
         if (address_str.empty())
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Monero address not provided";
+            j_response["message"] = "Ryo address not provided";
             return j_response;
         }
 
@@ -5020,7 +5020,7 @@ public:
         if (!xmreg::parse_str_address(address_str, address_info, nettype))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse monero address: " + address_str;
+            j_response["message"] = "Cant parse Ryo address: " + address_str;
             return j_response;
 
         }
@@ -5169,7 +5169,7 @@ public:
         if (!get_monero_network_info(j_info))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant get monero network info";
+            j_response["message"] = "Cant get Ryo network info";
             return j_response;
         }
 
