@@ -137,6 +137,11 @@ CurrentBlockchainStatus::calculate_emission_in_blocks(
 
         uint64_t coinbase_amount = get_outs_money_amount(blk.miner_tx);
 
+        if(start_blk == 0 && coinbase_amount == 8800000000000000)
+        {
+            coinbase_amount = 100000000000000;
+        }
+
         std::list<transaction> txs;
         std::list<crypto::hash> missed_txs;
 
