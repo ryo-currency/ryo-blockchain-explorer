@@ -486,6 +486,9 @@ public:
     index2(uint64_t page_no = 0, bool refresh_page = false)
     {
 
+        // Use commas for thousands separator
+        setlocale(LC_NUMERIC, "en_US.UTF-8");
+
         // we get network info, such as current hash rate
         // but since this makes a rpc call to deamon, we make it as an async
         // call. this way we dont have to wait with execution of the rest of the
@@ -517,6 +520,7 @@ public:
 
         // get the current blockchain height. Just to check
         uint64_t height = core_storage->get_current_blockchain_height();
+        string height_human = fmt::format("{:n}", height);
 
         // initalise page tempate map with basic info about blockchain
         mstch::map context {
@@ -527,6 +531,7 @@ public:
                 {"mainnet_url"              , mainnet_url},
                 {"refresh"                  , refresh_page},
                 {"height"                   , height},
+                {"height_human"             , height_human},
                 {"server_timestamp"         , xmreg::timestamp_to_str_gm(local_copy_server_timestamp)},
                 {"age_format"               , string("[h:m:d]")},
                 {"page_no"                  , page_no},
@@ -833,8 +838,11 @@ public:
             current_network_info.current = true;
         }
 
+        string difficulty_human = fmt::format("{:n}", current_network_info.difficulty);
+
         context["network_info"] = mstch::map {
                 {"difficulty"        , current_network_info.difficulty},
+                {"difficulty_human"  , difficulty_human},
                 {"hash_rate"         , hash_rate},
                 {"fee_per_kb"        , print_money(current_network_info.fee_per_kb)},
                 {"alt_blocks_no"     , current_network_info.alt_blocks_count},
@@ -876,11 +884,15 @@ public:
             string emission_blk_no   = std::to_string(current_values.blk_no - 1);
             string emission_coinbase = xmr_amount_to_str(current_values.coinbase, "{:0.3f}");
             string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.3f}");
+            string emission_coinbase_human = fmt::format("{:n}", static_cast<int64_t>(current_values.coinbase/1e9));
+            string emission_fee_human = fmt::format("{:n}", static_cast<int64_t>(current_values.fee/1e9));
 
             context["emission"] = mstch::map {
                     {"blk_no"    , emission_blk_no},
                     {"amount"    , emission_coinbase},
-                    {"fee_amount", emission_fee}
+                    {"fee_amount", emission_fee},
+                    {"amount_human", emission_coinbase_human},
+                    {"fee_human"   , emission_fee_human}
             };
         }
         else
