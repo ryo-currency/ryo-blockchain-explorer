@@ -584,6 +584,11 @@ main(int ac, const char* av[])
 
         cout << "Enable JSON API\n";
 
+        CROW_ROUTE(app, "/api")
+        ([&](const crow::request& req) {
+            return crow::response(xmrblocks.api());
+        });
+
         CROW_ROUTE(app, "/api/transaction/<string>")
         ([&](const crow::request &req, string tx_hash) {
 

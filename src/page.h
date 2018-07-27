@@ -47,6 +47,7 @@
 #define TMPL_ADDRESS                TMPL_DIR "/address.html"
 #define TMPL_MY_OUTPUTS             TMPL_DIR "/my_outputs.html"
 #define TMPL_SEARCH_RESULTS         TMPL_DIR "/search_results.html"
+#define TMPL_API                    TMPL_DIR "/api.html"
 #define TMPL_MY_RAWTX               TMPL_DIR "/rawtx.html"
 #define TMPL_MY_CHECKRAWTX          TMPL_DIR "/checkrawtx.html"
 #define TMPL_MY_PUSHRAWTX           TMPL_DIR "/pushrawtx.html"
@@ -412,6 +413,7 @@ public:
         template_file["checkoutputkeys"] = get_full_page(xmreg::read(TMPL_MY_CHECKRAWOUTPUTKEYS));
         template_file["address"]         = get_full_page(xmreg::read(TMPL_ADDRESS));
         template_file["search_results"]  = get_full_page(xmreg::read(TMPL_SEARCH_RESULTS));
+        template_file["api"]             = get_full_page(xmreg::read(TMPL_API));
         template_file["tx_details"]      = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_details.html");
         template_file["tx_table_header"] = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_table_header.html");
         template_file["tx_table_row"]    = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_table_row.html");
@@ -911,6 +913,18 @@ public:
 
         // render the page
         return mstch::render(template_file["index2"], context);
+    }
+
+    /**
+     * Render API help page
+     */
+    string
+    api()
+    {
+      mstch::map context {
+      };
+      add_css_style(context);
+      return mstch::render(template_file["api"], context);
     }
 
     /**
