@@ -5173,17 +5173,7 @@ public:
             return j_response;
         }
 
-        uint64_t fee_estimated {0};
-
-        // get dynamic fee estimate from last 10 blocks
-        if (!get_dynamic_per_kb_fee_estimate(fee_estimated))
-        {
-            j_response["status"]  = "error";
-            j_response["message"] = "Cant get dynamic fee esimate";
-            return j_response;
-        }
-
-        j_info["fee_per_kb"] = fee_estimated;
+        j_info["fee_per_kb"] = 500000;
 
         j_info["tx_pool_size"]        = MempoolStatus::mempool_no.load();
         j_info["tx_pool_size_kbytes"] = MempoolStatus::mempool_size.load();
@@ -6258,25 +6248,6 @@ private:
         };
 
         return local_copy_network_info.current;
-    }
-
-    bool
-    get_dynamic_per_kb_fee_estimate(uint64_t& fee_estimated)
-    {
-
-        string error_msg;
-
-        if (!rpc.get_dynamic_per_kb_fee_estimate(
-                FEE_ESTIMATE_GRACE_BLOCKS,
-                fee_estimated, error_msg))
-        {
-            cerr << "rpc.get_dynamic_per_kb_fee_estimate failed" << endl;
-            return false;
-        }
-
-        (void) error_msg;
-
-        return true;
     }
 
     bool
