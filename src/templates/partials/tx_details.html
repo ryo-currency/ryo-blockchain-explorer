@@ -1,31 +1,31 @@
 <div>
 
-  <div style="margin-bottom:20px">
-  <p style="margin:5px">Tx hash: {{tx_hash}}</p>
-  {{#enable_mixins_details}}
-  <p style="margin:5px">Tx prefix hash: {{tx_prefix_hash}}</p>
-  {{/enable_mixins_details}}
-  <p style="margin:5px">Tx public key: <span id="tx_pub_key">{{tx_pub_key}}</span></p>
-  <span id="add_tx_pub_keys" style="display: none;">{{add_tx_pub_keys}}</span>
+  <div class="line-break" style="margin-bottom:20px">
+    <p style="margin:5px">Tx hash: {{tx_hash}}</p>
+    {{#enable_mixins_details}}
+    <p style="margin:5px">Tx prefix hash: {{tx_prefix_hash}}</p>
+    {{/enable_mixins_details}}
+    <p style="margin:5px">Tx public key: <span id="tx_pub_key">{{tx_pub_key}}</span></p>
+    <span id="add_tx_pub_keys" style="display: none;">{{add_tx_pub_keys}}</span>
 
-  {{#has_payment_id}}
-  <p style="margin:5px">Payment id: <span id="payment_id">{{payment_id}}</span></p>
-  <p style="margin:5px">Payment id as ascii: {{payment_id_as_ascii}}</p>
-  {{/has_payment_id}}
+    {{#has_payment_id}}
+    <p style="margin:5px">Payment id: <span id="payment_id">{{payment_id}}</span></p>
+    <p style="margin:5px">Payment id as ascii: {{payment_id_as_ascii}}</p>
+    {{/has_payment_id}}
 
-  {{#has_payment_id8}}
-  <p style="margin:5px">Payment id (encrypted): <span id="payment_id">{{payment_id8}}</span></p>
-  {{/has_payment_id8}}
+    {{#has_payment_id8}}
+    <p style="margin:5px">Payment id (encrypted): <span id="payment_id">{{payment_id8}}</span></p>
+    {{/has_payment_id8}}
 
 
-  {{#have_prev_hash}}
-  <p>Previous tx: <a href="/tx/{{prev_hash}}">{{prev_hash}}</a></p>
-  {{/have_prev_hash}}
+    {{#have_prev_hash}}
+    <p>Previous tx: <a href="/tx/{{prev_hash}}">{{prev_hash}}</a></p>
+    {{/have_prev_hash}}
 
-  {{#have_next_hash}}
-  <p>Next tx: <a href="/tx/{{next_hash}}">{{next_hash}}</a></p>
-  {{/have_next_hash}}
-</div>
+    {{#have_next_hash}}
+    <p>Next tx: <a href="/tx/{{next_hash}}">{{next_hash}}</a></p>
+    {{/have_next_hash}}
+  </div>
 
   <div class="table-scroller">
     <div class="table-container">
@@ -406,11 +406,13 @@
   <small>(from {{min_mix_time}} till {{max_mix_time}};
     resolution: {{timescales_scale}} days{{#have_raw_tx}}; R - real ring member {{/have_raw_tx}})
   </small>
-  <ul>
-    {{#timescales}}
-    <li  style="list-style-type:none;text-align:center;font-size:8px;margin-bottom:8px">|{{timescale}}|</li>
-    {{/timescales}}
-  </ul>
+  <div class="table-scroller">
+    <ul style="padding:0">
+      {{#timescales}}
+      <li  style="list-style-type:none;text-align:center;font-size:8px;margin-bottom:8px">|{{timescale}}|</li>
+      {{/timescales}}
+    </ul>
+  </div>
 </div>
 {{/enable_mixins_details}}
 
@@ -435,7 +437,7 @@
 
 {{#inputs}}
 <div class="input" style="margin-bottom:40px">
-  <p>
+  <p class="line-break">
     key image  {{input_idx}}: {{in_key_img}}
     {{#have_raw_tx}}
     Already spent:

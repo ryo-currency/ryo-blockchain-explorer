@@ -1,20 +1,18 @@
-# Onion Monero Blockchain Explorer
+# Ryo Blockchain Explorer
 
-Currently available Monero blockchain explorers have several limitations which are of
-special importance to privacy-oriented users:
+Forked from [Onion Monero Blockchain Explorer](https://github.com/moneroexamples/onion-monero-blockchain-explorer)
 
- - they use JavaScript,
- - have images which might be used for [cookieless tracking](http://lucb1e.com/rp/cookielesscookies/),
- - track users activates through google analytics,
- - are closed sourced,
- - are not available as hidden services,
- - do not support Monero testnet nor stagenet networks,
- - have limited JSON API.
+Full featured Ryo blockchain explorer for privacy-oriented users:
+
+ - Does not use JavaScript,
+ - Does not have images which might be used for [cookieless tracking](http://lucb1e.com/rp/cookielesscookies/),
+ - Does not track users activates through google analytics,
+ - Open source,
+ - Supports Ryo testnet nor stagenet networks,
+ - Full featured JSON API.
 
 
-In this example, these limitations are addressed by development of
-an Onion Monero Blockchain Explorer. The example not only shows how to use
-Monero C++ libraries, but also demonstrates how to use:
+Libraries:
 
  - [crow](https://github.com/ipkn/crow) - C++ micro web framework
  - [mstch](https://github.com/no1msd/mstch) - C++ {{mustache}} templates
@@ -23,45 +21,13 @@ Monero C++ libraries, but also demonstrates how to use:
 
 ## Explorer hosts
 
-Tor users:
+ - [https://explorer.ryo-currency.com/](https://explorer.ryo-currency.com/) - Official Explorer
+ - [https://explorer.ryoblocks.com/](https://explorer.ryoblocks.com/) - RyoBlocks Explorer
+ - [https://tnexp.ryo-currency.com/](https://tnexp.ryo-currency.com/) - Testnet Explorer
 
- - [http://dvwae436pd7nt4bc.onion](http://dvwae436pd7nt4bc.onion) (Front-end templates are [maintained by @suhz](https://github.com/suhz/onion-monero-blockchain-explorer/tree/moneroexplorer.com/src/templates)).
+## Ryo Blockchain Explorer features
 
-Clearnet versions:
- - [https://labor.serveo.net/](https://labor.serveo.net/) - temprorary link (slow), bleading edge version.
- - [https://xmrchain.net/](https://xmrchain.net/) - https enabled, most popular and very stable.
- - [https://MoneroExplorer.com/](https://moneroexplorer.com/) - nice looking one, https enabled.
- - [https://monerohash.com/explorer/](https://monerohash.com/explorer/) - nice looking one, https enabled.
- - [http://explore.MoneroWorld.com](http://explore.moneroworld.com) - same as the second one.
- - [https://moneroexplorer.pro/](https://moneroexplorer.pro/) - nice looking one, https enabled.
- - [http://monerochain.com/](http://monerochain.com/) - JSON API based, multiple nodes.   
- - [https://blox.minexmr.com/](https://blox.minexmr.com/) - - https enabled.
-
-Testnet version:
-
- - [http://nimis.serveo.net/](http://nimis.serveo.net/) - bleeding edge version (down currently).
- - [https://testnet.xmrchain.com/](https://testnet.xmrchain.com/) - https enabled.
- - [https://explorer.monero-otc.com/](https://explorer.monero-otc.com/) - https enabled.
-
-Stagenet version:
-
- - [http://162.210.173.150:8083/](http://162.210.173.150:8083/) - recent version.
-
-i2p users (main Monero network):
-
- - [http://7o4gezpkye6ekibhgpkg7v626ze4idsirapufzrefkdysa6zxhha.b32.i2p/](http://7o4gezpkye6ekibhgpkg7v626ze4idsirapufzrefkdysa6zxhha.b32.i2p/)
-
-Alternative block explorers:
-
-- [http://moneroblocks.info](http://moneroblocks.info/)
-- [https://monerobase.com](https://monerobase.com/)
-- [https://monerovision.com](https://monerovision.com)
-- [http://chainradar.com](http://chainradar.com/xmr/blocks)
-
-
-## Onion Monero Blockchain Explorer features
-
-The key features of the Onion Monero Blockchain Explorer are:
+The key features of the Ryo Blockchain Explorer are:
 
  - no cookies, no web analytics trackers, no images,
  - by default no JavaScript, but can be enabled for client side decoding and proving transactions,
@@ -70,12 +36,12 @@ The key features of the Onion Monero Blockchain Explorer are:
  - showing encrypted payments ID,
  - showing ring signatures,
  - showing transaction extra field,
- - showing public components of Monero addresses,
- - decoding which outputs and mixins belong to the given Monero address and viewkey,
- - can prove that you send Monero to someone,
+ - showing public components of Ryo addresses,
+ - decoding which outputs and mixins belong to the given Ryo address and viewkey,
+ - can prove that you send Ryo to someone,
  - detailed information about ring members, such as, their age, timescale and their ring sizes,
  - showing number of amount output indices,
- - support Monero testnet and stagnet networks,
+ - support Ryo testnet and stagnet networks,
  - tx checker and pusher for online pushing of transactions,
  - estimate possible spendings based on address and viewkey,
  - can provide total amount of all miner fees,
@@ -83,63 +49,49 @@ The key features of the Onion Monero Blockchain Explorer are:
  - decoding outputs and proving txs sent to sub-address.
 
 
-## Development branch
-
-Current development branch:
-
- - https://github.com/moneroexamples/onion-monero-blockchain-explorer/tree/devel
-
-
-
 ## Compilation on Ubuntu 16.04/18.04
 
-##### Compile latest Monero development version
+##### Compile latest Ryo development version
 
-Download and compile recent Monero into your home folder:
+Download and compile recent Ryo into your home folder:
 
 ```bash
-# first install monero dependecines
+# first install ryo dependecines
 sudo apt update
 
-sudo apt install git build-essential cmake libboost-all-dev miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev libcurl4-openssl-dev libgtest-dev libreadline-dev libzmq3-dev libsodium-dev libpcsclite-dev
+sudo apt install build-essential cmake pkg-config libboost-all-dev libssl-dev libzmq3-dev libunbound-dev libsodium-dev libminiupnpc-dev libunwind8-dev liblzma-dev libreadline6-dev libldns-dev libexpat1-dev doxygen graphviz libpcsclite-dev
 
 # go to home folder
 cd ~
 
-git clone --recursive https://github.com/monero-project/monero
+git clone --recursive https://github.com/ryo-currency/ryo-currency.git
 
-cd monero/
-
-# checkout last monero version
-git checkout -b last_release v0.12.1.0
+cd ryo-currency/
 
 make
 ```
 
 ##### Compile and run the explorer
 
-Once the Monero is compiles, the explorer can be downloaded and compiled
+Once the Ryo is compiled, the explorer can be downloaded and compiled
 as follows:
 
 ```bash
-# go to home folder if still in ~/monero
+# go to home folder if still in ~/ryo-currency
 cd ~
 
 # download the source code
-git clone https://github.com/moneroexamples/onion-monero-blockchain-explorer.git
+git clone https://github.com/ryo-currency/ryo-blockchain-explorer.git
 
 # enter the downloaded sourced code folder
-cd onion-monero-blockchain-explorer
+cd ryo-blockchain-explorer
 
 # make a build folder and enter it
 mkdir build && cd build
 
 # create the makefile
-cmake ..
+cmake -DMONERO_DIR=~/ryo-currency ..
 
-# altearnatively can use: cmake -DMONERO_DIR=/path/to/monero_folder ..
-# if monero is not in ~/monero
-#
 # also can build with ASAN (sanitizers), for example
 # cmake -DSANITIZE_ADDRESS=On ..
 
@@ -150,24 +102,15 @@ make
 
 To run it:
 ```
-./xmrblocks
-```
-
-By default it will look for blockchain in its default location i.e., `~/.bitmonero/lmdb`.
-You can use `-b` option if its in different location.
-
-For example:
-
-```bash
-./xmrblocks -b /home/mwo/non-defult-monero-location/lmdb/
+./xmrblocks -b /home/user/.ryo/lmdb02/
 ```
 
 Example output:
 
 ```bash
-[mwo@arch onion-monero-blockchain-explorer]$ ./xmrblocks
-2016-May-28 10:04:49.160280 Blockchain initialized. last block: 1056761, d0.h0.m12.s47 time ago, current difficulty: 1517857750
-(2016-05-28 02:04:49) [INFO    ] Crow/0.1 server is running, local port 8081
+user@arch:~/ryo-blockchain-explorer/build$ ./xmrblocks -b /home/user/.ryo/lmdb02
+Staring in non-ssl mode
+(2018-07-27 01:06:02) [INFO    ] Crow/0.1 server is running at 127.0.0.1:8081 using 4 threads
 ```
 
 Go to your browser: http://127.0.0.1:8081
@@ -175,7 +118,7 @@ Go to your browser: http://127.0.0.1:8081
 ## The explorer's command line options
 
 ```
-xmrblocks, Onion Monero Blockchain Explorer:
+xmrblocks, Ryo Blockchain Explorer:
   -h [ --help ] [=arg(=1)] (=0)         produce help message
   -t [ --testnet ] [=arg(=1)] (=0)      use testnet blockchain
   -s [ --stagenet ] [=arg(=1)] (=0)     use stagenet blockchain
@@ -199,7 +142,7 @@ xmrblocks, Onion Monero Blockchain Explorer:
                                         enable users to have the index page on
                                         autorefresh
   --enable-emission-monitor [=arg(=1)] (=0)
-                                        enable Monero total emission monitoring
+                                        enable Ryo total emission monitoring
                                         thread
   -p [ --port ] arg (=8081)             default explorer port
   --testnet-url arg                     you can specify testnet url, if you run
@@ -218,30 +161,18 @@ xmrblocks, Onion Monero Blockchain Explorer:
   --mempool-refresh-time arg (=5)       time, in seconds, for each refresh of
                                         mempool state
   -b [ --bc-path ] arg                  path to lmdb folder of the blockchain,
-                                        e.g., ~/.bitmonero/lmdb
+                                        e.g., ~/.ryo/lmdb02
   --ssl-crt-file arg                    path to crt file for ssl (https)
                                         functionality
   --ssl-key-file arg                    path to key file for ssl (https)
                                         functionality
-  -d [ --deamon-url ] arg (=http:://127.0.0.1:18081)
-                                        Monero deamon url
+  -d [ --deamon-url ] arg (=http:://127.0.0.1:12211)
+                                        Ryo deamon url
 ```
 
-Example usage, defined as bash aliases.
+## Enable Ryo emission
 
-```bash
-# for mainnet explorer
-alias xmrblocksmainnet='~/onion-monero-blockchain-explorer/build/xmrblocks    --port 8081 --testnet-url "http://139.162.32.245:8082" --enable-pusher --enable-emission-monitor'
-
-# for testnet explorer
-alias xmrblockstestnet='~/onion-monero-blockchain-explorer/build/xmrblocks -t --port 8082 --mainnet-url "http://139.162.32.245:8081" --enable-pusher --enable-emission-monitor'
-```
-
-These are aliases similar to those used for http://139.162.32.245:8081/ and http://139.162.32.245:8082/, respectively.
-
-## Enable Monero emission
-
-Obtaining current Monero emission amount is not straight forward. Thus, by default it is
+Obtaining current Ryo emission amount is not straight forward. Thus, by default it is
 disabled. To enable it use `--enable-emission-monitor` flag, e.g.,
 
 
@@ -253,10 +184,10 @@ This flag will enable emission monitoring thread. When started, the thread
  will initially scan the entire blockchain, and calculate the cumulative emission based on each block.
 Since it is a separate thread, the explorer will work as usual during this time.
 Every 10000 blocks, the thread will save current emission in a file, by default,
- in `~/.bitmonero/lmdb/emission_amount.txt`. For testnet or stagenet networks,
- it is `~/.bitmonero/testnet/lmdb/emission_amount.txt` or `~/.bitmonero/stagenet/lmdb/emission_amount.txt`. This file is used so that we don't
+ in `~/.ryo/lmdb/emission_amount.txt`. For testnet or stagenet networks,
+ it is `~/.ryo/testnet/lmdb/emission_amount.txt` or `~/.ryo/stagenet/lmdb/emission_amount.txt`. This file is used so that we don't
  need to rescan entire blockchain whenever the explorer is restarted. When the
- explorer restarts, the thread will first check if `~/.bitmonero/lmdb/emission_amount.txt`
+ explorer restarts, the thread will first check if `~/.ryo/lmdb/emission_amount.txt`
  is present, read its values, and continue from there if possible. Subsequently, only the initial
  use of the tread is time consuming. Once the thread scans the entire blockchain, it updates
  the emission amount using new blocks as they come. Since the explorer writes this file, there can
@@ -270,13 +201,16 @@ Every 10000 blocks, the thread will save current emission in a file, by default,
  displayed on the front page, e.g., :
 
 ```
-Monero emission (fees) is 14485540.430 (52545.373) as of 1313448 block
+Ryo emission (fees) is 14485540.430 (52545.373) as of 1313448 block
 ```
 
-The values given, can be checked using Monero daemon's  `print_coinbase_tx_sum` command.
+The values given, can be checked using Ryo daemon's  `print_coinbase_tx_sum` command.
 For example, for the above example: `print_coinbase_tx_sum 0 1313449`.
 
 To disable the monitor, simply restart the explorer without `--enable-emission-monitor` flag.
+
+Note: The pre-mined coins have been frozen/burned in commit [c3a3cb6](https://github.com/ryo-currency/ryo-emergency/commit/c3a3cb620488e88be7c52e017072261a3063b872)/ [blockchain_db/blockchain_db.cpp#L250-L258](https://github.com/ryo-currency/ryo-emergency/blob/c3a3cb620488e88be7c52e017072261a3063b872/src/blockchain_db/blockchain_db.cpp#L250-L258) and a modification has been made to the explorer to remove 8,700,000 coins from circulation.
+
 
 ## Enable JavaScript for decoding proving transactions
 
@@ -307,8 +241,9 @@ Having the `crt` and `key` files, run `xmrblocks` in the following way:
 ```
 
 Note: Because we generated our own certificate, modern browsers will complain
-about it as they cant verify the signatures against any third party. So probably
-for any practical use need to have properly issued ssl certificates.
+about it as they can't verify the signatures against any third party. So probably
+for any practical use need to have properly issued ssl certificates. Alternatively,
+use an SSL terminator such as nginx.
 
 ## JSON API
 
@@ -322,255 +257,270 @@ By default the api is disabled. To enable it, use `--enable-json-api` flag, e.g.
 #### api/transaction/<tx_hash>
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/transaction/6093260dbe79fd6277694d14789dc8718f1bd54457df8bab338c2efa3bb0f03d"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/transaction/4307e5619b29dcc1d9cdf4a52b3d0717bcbab0efc06d88fb79a1e0e33594e6ec"
 ```
 
 Partial results shown:
 
 ```json
 {
-  "data": {
-    "block_height": 1268252,
-    "coinbase": false,
-    "confirmations": 1,
-    "current_height": 1268253,
-    "extra": "01be23e277aed6b5f41f66b05244bf994c13108347366ec678ae16657f0fc3a22b",
-    "inputs": [
-      {
-        "amount": 0,
-        "key_image": "67838fd0ffd79f13e735830d3ec60412aed59e53e1f997feb6f73d088b949611",
-        "mixins": [
-          {
-            "block_no": 1238623,
-            "public_key": "0a5b853c55303c10e1326acfb085b9e246e088b1ccac7e37f7a810d46a28a914"
-          },
-          {
-            "block_no": 1246942,
-            "public_key": "527cf86f5abbfb006c970f7c6eb40493786d4751306f8985c6a43f98a88c0dff"
-          }
-        ]
-      }
-    ],
-    "mixin": 9,
-    "outputs": [
-      {
-        "amount": 0,
-        "public_key": "525779873776e4a42f517fd79b72e7c31c3ba03e730fc32287f6414fb702c1d7"
-      },
-      {
-        "amount": 0,
-        "public_key": "e25f00fceb77af841d780b68647618812695b4ca6ebe338faba6e077f758ac30"
-      }
-    ],
-    "payment_id": "",
-    "payment_id8": "",
-    "rct_type": 1,
-    "timestamp": 1489753456,
-    "timestamp_utc": "2017-03-17 12:24:16",
-    "tx_fee": 12517785574,
-    "tx_hash": "6093260dbe79fd6277694d14789dc8718f1bd54457df8bab338c2efa3bb0f03d",
-    "tx_size": 13323,
-    "tx_version": 2,
-    "xmr_inputs": 0,
-    "xmr_outputs": 0
-  },
-  "status": "success"
+   "data":{
+      "block_height":156844,
+      "coinbase":true,
+      "confirmations":4,
+      "current_height":156848,
+      "extra":"0190c6a55fe6d77033f225291b36d22b700264d9c3f7c3648516f73f6470216015021039303031000000020000001049d4e900",
+      "inputs":null,
+      "mixin":0,
+      "outputs":[
+         {  
+            "amount":41978500000,
+            "public_key":"9935ac366ebd6fb6aee84581d9027dd0498ff6761a470bfaa8e48ff429788e22"
+         }
+      ],
+      "payment_id":"",
+      "payment_id8":"",
+      "rct_type":0,
+      "timestamp":1532649166,
+      "timestamp_utc":"2018-07-26 23:52:46",
+      "tx_fee":0,
+      "tx_hash":"4307e5619b29dcc1d9cdf4a52b3d0717bcbab0efc06d88fb79a1e0e33594e6ec",
+      "tx_size":102,
+      "tx_version":3,
+      "xmr_inputs":0,
+      "xmr_outputs":41978500000
+   },
+   "status":"success"
 }
 ```
+
+---
 
 #### api/transactions
 
 Transactions in last 25 blocks
 
-
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/transactions"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/transactions"
 ```
 
 Partial results shown:
 
 ```json
 {
-  "data": {
-    "blocks": [
-      {
-        "age": "33:16:49:53",
-        "height": 1268252,
-        "size": 105390000000000000,
-        "timestamp": 1489753456,
-        "timestamp_utc": "2017-03-17 12:24:16",
-        "txs": [
-          {
-            "coinbase": true,
-            "mixin": 0,
-            "outputs": 8491554678365,
-            "rct_type": 0,
-            "tx_fee": 0,
-            "tx_hash": "7c4286f64544568265bb5418df84ae69afaa3567749210e46f8340c247f4803f",
-            "tx_size": 151000000000000,
-            "tx_version": 2
-          },
-          {
-            "coinbase": false,
-            "mixin": 5,
-            "outputs": 0,
-            "rct_type": 2,
-            "tx_fee": 17882516700,
-            "tx_hash": "2bfbccb918ee5f050808dd040ce03943b7315b81788e9cdee59cf86b557ba48c",
-            "tx_size": 19586000000000000,
-            "tx_version": 2
-          }
-        ]
-      }
-    ],
-    "limit": 25,
-    "page": 0
-  },
-  "status": "success"
+   "data":{
+      "blocks":[
+         {
+            "age":"00:05:41",
+            "hash":"e3ff8c52516b8389888ee742d7f18448e3760199560f24ebd80092e46019fa9c",
+            "height":156848,
+            "size":28268.0,
+            "timestamp":1532649512,
+            "timestamp_utc":"2018-07-26 23:58:32",
+            "txs":[
+               {
+                  "coinbase":true,
+                  "extra":"01c9417029a41208a7142bf3a458935403328b34ca54a6c8b8a2ecf661043844000211af08e9cf0732704a000000000000000000",
+                  "mixin":0,
+                  "payment_id":"",
+                  "payment_id8":"",
+                  "rct_type":0,
+                  "tx_fee":0,
+                  "tx_hash":"5ace475abe36a574ee0d73e2c6aa5ba37473361934ed1b36981f17cbd8c6ecb4",
+                  "tx_size":103,
+                  "tx_version":3,
+                  "xmr_inputs":0,
+                  "xmr_outputs":41999000000
+               },
+               {
+                  "coinbase":false,
+                  "extra":"0181a8586bb9e3f98e04b80496632a9fea2afa59fb5e3c844b1ab28182f833e053",
+                  "mixin":13,
+                  "payment_id":"",
+                  "payment_id8":"",
+                  "rct_type":1,
+                  "tx_fee":14000000,
+                  "tx_hash":"242b5bca09edf614a6440a183c949934dbc1de82176bc2103141be7aed39ae32",
+                  "tx_size":13586,
+                  "tx_version":3,
+                  "xmr_inputs":0,
+                  "xmr_outputs":0
+               },
+               {
+                  "coinbase":false,
+                  "extra":"01622d73b89759ab0ba0d9fb211fd430ada1b5958eea6a14b5aa08f0cd0a1def1c",
+                  "mixin":13,
+                  "payment_id":"",
+                  "payment_id8":"",
+                  "rct_type":2,
+                  "tx_fee":15000000,
+                  "tx_hash":"01cf17ce53e132f1a987cb1b4dbfe51d13a163425d2202744c624166514746d9",
+                  "tx_size":14579,
+                  "tx_version":3,
+                  "xmr_inputs":0,
+                  "xmr_outputs":0
+               }
+            ]
+         },
+      ],
+      "current_height":156849,
+      "limit":25,
+      "page":0,
+      "total_page_no":6273
+   },
+   "status":"success"
 }
 ```
 
+---
+
 #### api/transactions?page=<page_no>&limit=<tx_per_page>
 
-
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/transactions?page=2&limit=10"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/transactions?page=2&limit=10"
 ```
 
 Result analogical to the one above.
 
+---
+
 #### api/block/<block_number|block_hash>
 
-
 ```bash
-curl  -w "\n" -X GET "http://139.162.32.245:8081/api/block/1293257"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/block/150000"
 ```
 
 Partial results shown:
 
 ```json
 {
-  "data": {
-    "block_height": 1293257,
-    "block_reward": 0,
-    "current_height": 1293264,
-    "hash": "9ef6bb8f9b8bd253fc6390e5c2cdc45c8ee99fad16447437108bf301fe6bd6e1",
-    "size": 141244,
-    "timestamp": 1492761974,
-    "timestamp_utc": "2017-04-21 08:06:14",
-    "txs": [
-      {
-        "coinbase": true,
-        "extra": "018ae9560eb85d5ebd22d3beaed55c21d469eab430c5e3cac61b3fe2f5ad156770020800000001a9030800",
-        "mixin": 0,
-        "payment_id": "",
-        "payment_id8": "",
-        "rct_type": 0,
-        "tx_fee": 0,
-        "tx_hash": "3ff71b65bec34c9261e01a856e6a03594cf0472acf6b77db3f17ebd18eaa30bf",
-        "tx_size": 95,
-        "tx_version": 2,
-        "xmr_inputs": 0,
-        "xmr_outputs": 8025365394426
-      }
-    ]
-  },
-  "status": "success"
+   "data":{
+      "block_height":150000,
+      "current_height":156849,
+      "hash":"debc58ac64fc8dc7ae35b0b8782ae33a0fe5855dc85930bc52b8fec3c1aee94a",
+      "size":422899,
+      "timestamp":1530990884,
+      "timestamp_utc":"2018-07-07 19:14:44",
+      "txs":[
+         {
+            "coinbase":true,
+            "extra":"01e10420c2c5461ace855ffc8aa4a8256e784e873c325d71e798812ac90c35c19b020816d80f5c00000000",
+            "mixin":0,
+            "payment_id":"",
+            "payment_id8":"",
+            "rct_type":0,
+            "tx_fee":0,
+            "tx_hash":"2743243d3eb70b88baa26f70dd20c606470c5995de194ad9d0d4acf83d5ab761",
+            "tx_size":94,
+            "tx_version":3,
+            "xmr_inputs":0,
+            "xmr_outputs":42187500000
+         },
+      ]
+   },
+   "status":"success"
 }
 ```
+
+---
 
 #### api/mempool
 
 Return all txs in the mempool.
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/mempool"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/mempool"
 ```
 
 Partial results shown:
 
 ```json
 {
-  "data": {
-    "limit": 100000000,
-    "page": 0,
-    "total_page_no": 0,
-    "txs": [
-      {
-        "coinbase": false,
-        "extra": "022100325f677d96f94155a4840a84d8e0c905f7a4697a25744633bcb438feb1e51fb2012eda81bf552c53c2168f4130dbe0265c3a7898f3a7eee7c1fed955a778167b5d",
-        "mixin": 3,
-        "payment_id": "325f677d96f94155a4840a84d8e0c905f7a4697a25744633bcb438feb1e51fb2",
-        "payment_id8": "",
-        "rct_type": 2,
-        "timestamp": 1494470894,
-        "timestamp_utc": "2017-05-11 02:48:14",
-        "tx_fee": 15894840000,
-        "tx_hash": "9f3374f8ac67febaab153eab297937a3d0d2c706601e496bf5028146da0c9aef",
-        "tx_size": 13291,
-        "tx_version": 2,
-        "xmr_inputs": 0,
-        "xmr_outputs": 0
-      }
-    ],
-    "txs_no": 7
-  },
-  "status": "success"
+   "data":{
+      "limit":100000000,
+      "page":0,
+      "total_page_no":0,
+      "txs":[
+         {
+            "coinbase":false,
+            "extra":"0221000140bc7298830abaeb711b7214acb45c431db86c52da40f739fb6908f5dbe596019d29ab0f8b846889d1971d8d7915baab2b2335c4105bcdda1517544f2c4aa086",
+            "mixin":13,
+            "payment_id":"0140bc7298830abaeb711b7214acb45c431db86c52da40f739fb6908f5dbe596",
+            "payment_id8":"",
+            "rct_type":2,
+            "timestamp":0,
+            "timestamp_utc":"1970-01-01 00:00:00",
+            "tx_fee":8000000,
+            "tx_hash":"8f00e3746c7fe1e50bd72da69e00449b53586fbd793ed392a63c283b9fbf7c49",
+            "tx_size":15584,
+            "tx_version":3,
+            "xmr_inputs":0,
+            "xmr_outputs":0
+         },
+      ],
+      "txs_no":3
+   },
+   "status":"success"
 }
 ```
 
 Limit of 100000000 is just default value above to ensure that all mempool txs are fetched
 if no specific limit given.
 
+---
+
 #### api/mempool?limit=<no_of_top_txs>
 
 Return number of newest mempool txs, e.g., only 10.
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/mempool?limit=10"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/mempool?limit=10"
 ```
 
 Result analogical to the one above.
 
+---
+
 #### api/search/<block_number|tx_hash|block_hash>
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/search/1293669"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/search/150000"
 ```
 
 Partial results shown:
 
 ```json
 {
-  "data": {
-    "block_height": 1293669,
-    "current_height": 1293670,
-    "hash": "5d55b8fabf85b0b4c959d66ad509eb92ddfe5c2b0e84e1760abcb090195c1913",
-    "size": 118026,
-    "timestamp": 1492815321,
-    "timestamp_utc": "2017-04-21 22:55:21",
-    "title": "block",
-    "txs": [
-      {
-        "coinbase": true,
-        "extra": "01cb7fda09033a5fa06dc601b9295ef3790397cf3c645e958e34cf7ab699d2f5230208000000027f030200",
-        "mixin": 0,
-        "payment_id": "",
-        "payment_id8": "",
-        "rct_type": 0,
-        "tx_fee": 0,
-        "tx_hash": "479ba432f5c88736b438dd4446a11a13046a752d469f7828151f5c5b86be4e9a",
-        "tx_size": 95,
-        "tx_version": 2,
-        "xmr_inputs": 0,
-        "xmr_outputs": 7992697599717
-      }
-    ]
-  },
-  "status": "success"
+   "data":{
+      "block_height":150000,
+      "current_height":156850,
+      "hash":"debc58ac64fc8dc7ae35b0b8782ae33a0fe5855dc85930bc52b8fec3c1aee94a",
+      "size":422899,
+      "timestamp":1530990884,
+      "timestamp_utc":"2018-07-07 19:14:44",
+      "title":"block",
+      "txs":[
+         {
+            "coinbase":true,
+            "extra":"01e10420c2c5461ace855ffc8aa4a8256e784e873c325d71e798812ac90c35c19b020816d80f5c00000000",
+            "mixin":0,
+            "payment_id":"",
+            "payment_id8":"",
+            "rct_type":0,
+            "tx_fee":0,
+            "tx_hash":"2743243d3eb70b88baa26f70dd20c606470c5995de194ad9d0d4acf83d5ab761",
+            "tx_size":94,
+            "tx_version":3,
+            "xmr_inputs":0,
+            "xmr_outputs":42187500000
+         },
+      ]
+   },
+   "status":"success"
 }
 ```
 
+---
 
 #### api/outputs?txhash=<tx_hash>&address=<address>&viewkey=<viewkey>&txprove=<0|1>
 
@@ -582,14 +532,14 @@ For this, we use recipient's address and our tx private key as a viewkey value,
 Checking outputs:
 
 ```bash
-# we use here official Monero project's donation address as an example
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/outputs?txhash=17049bc5f2d9fbca1ce8dae443bbbbed2fc02f1ee003ffdd0571996905faa831&address=44AFFq5kSiGBoZ4NMDwYtN18obc8AemS33DBLWs3H7otXft3XjrpDtQGv7SqSsaBYBb98uNbr2VBBEt7f2wfn3RVGQBEP3A&viewkey=f359631075708155cc3d92a32b75a7d02a5dcf27756707b47a2b31b21c389501&txprove=0"
+# we use here official Ryo project's donation address as an example
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/outputs?txhash=17049bc5f2d9fbca1ce8dae443bbbbed2fc02f1ee003ffdd0571996905faa831&address=RYoLshW4LVn8TurtCrZzAd79FURtPHb93ATRYch3JpSDgvPRubk1VeEKg33sVifjASf7NzZtgQ6urVAAAKDKDtmUiDraNbdDvyk&viewkey=f359631075708155cc3d92a32b75a7d02a5dcf27756707b47a2b31b21c389501&txprove=0"
 ```
 
 ```json
 {
   "data": {
-    "address": "42f18fc61586554095b0799b5c4b6f00cdeb26a93b20540d366932c6001617b75db35109fbba7d5f275fef4b9c49e0cc1c84b219ec6ff652fda54f89f7f63c88",
+    "address": "RYoLshW4LVn8TurtCrZzAd79FURtPHb93ATRYch3JpSDgvPRubk1VeEKg33sVifjASf7NzZtgQ6urVAAAKDKDtmUiDraNbdDvyk",
     "outputs": [
       {
         "amount": 34980000000000,
@@ -614,18 +564,17 @@ curl  -w "\n" -X GET "http://127.0.0.1:8081/api/outputs?txhash=17049bc5f2d9fbca1
 
 Proving transfer:
 
-We use recipient's address (i.e. not our address from which we sent xmr to recipient).
+We use recipient's address (i.e. not our address from which we sent Ryo to recipient).
 For the viewkey, we use `tx_private_key` (although the GET variable is still called `viewkey`) that we obtained by sending this txs.
 
 ```bash
-# this is for testnet transaction
-curl  -w "\n" -X GET "http://127.0.0.1:8082/api/outputs?txhash=94782a8c0aa8d8768afa0c040ef0544b63eb5148ca971a024ac402cad313d3b3&address=9wUf8UcPUtb2huK7RphBw5PFCyKosKxqtGxbcKBDnzTCPrdNfJjLjtuht87zhTgsffCB21qmjxjj18Pw7cBnRctcKHrUB7N&viewkey=e94b5bfc599d2f741d6f07e3ab2a83f915e96fb374dfb2cd3dbe730e34ecb40b&txprove=1"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/outputs?txhash=94782a8c0aa8d8768afa0c040ef0544b63eb5148ca971a024ac402cad313d3b3&address=RYoLshW4LVn8TurtCrZzAd79FURtPHb93ATRYch3JpSDgvPRubk1VeEKg33sVifjASf7NzZtgQ6urVAAAKDKDtmUiDraNbdDvyk&viewkey=e94b5bfc599d2f741d6f07e3ab2a83f915e96fb374dfb2cd3dbe730e34ecb40b&txprove=1"
 ```
 
 ```json
 {
   "data": {
-    "address": "71bef5945b70bc0a31dbbe6cd0bd5884fe694bbfd18fff5f68f709438554fb88a51b1291e378e2f46a0155108782c242cc1be78af229242c36d4f4d1c4f72da2",
+    "address": "RYoLshW4LVn8TurtCrZzAd79FURtPHb93ATRYch3JpSDgvPRubk1VeEKg33sVifjASf7NzZtgQ6urVAAAKDKDtmUiDraNbdDvyk",
     "outputs": [
       {
         "amount": 1000000000000,
@@ -648,56 +597,61 @@ curl  -w "\n" -X GET "http://127.0.0.1:8082/api/outputs?txhash=94782a8c0aa8d8768
 }
 ```
 
-
 Result analogical to the one above.
+
+---
 
 #### api/networkinfo
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/networkinfo"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/networkinfo"
 ```
 
 ```json
 {
-  "data": {
-    "alt_blocks_count": 0,
-    "block_size_limit": 600000,
-    "cumulative_difficulty": 2091549555696348,
-    "difficulty": 7941560081,
-    "fee_per_kb": 303970000,
-    "grey_peerlist_size": 4991,
-    "hash_rate": 66179667,
-    "height": 1310423,
-    "incoming_connections_count": 0,
-    "outgoing_connections_count": 5,
-    "start_time": 1494822692,
-    "status": "OK",
-    "target": 120,
-    "target_height": 0,
-    "testnet": false,
-    "top_block_hash": "76f9e85d62415312758bc09e0b9b48fd2b005231ad1eee435a8081e551203f82",
-    "tx_count": 1219048,
-    "tx_pool_size": 2,
-    "white_peerlist_size": 1000
-  },
-  "status": "success"
+   "data":{
+      "alt_blocks_count":9,
+      "block_size_limit":491520,
+      "block_size_median":14191,
+      "cumulative_difficulty":284889040816739,
+      "current":true,
+      "current_hf_version":4,
+      "difficulty":1085277793,
+      "fee_per_kb":500000,
+      "grey_peerlist_size":0,
+      "hash_rate":4521990,
+      "height":156853,
+      "incoming_connections_count":12,
+      "outgoing_connections_count":1,
+      "stagenet":false,
+      "start_time":1531440507,
+      "status":true,
+      "target":240,
+      "target_height":156824,
+      "testnet":false,
+      "top_block_hash":"f0eb0e43acbd75c040279f847129573aa0d5e43e5d0a13f601ccf04c2fd689a3",
+      "tx_count":433613,
+      "tx_pool_size":1,
+      "tx_pool_size_kbytes":15582,
+      "white_peerlist_size":1000
+   },
+   "status":"success"
 }
 ```
+
+---
 
 #### api/outputsblocks
 
 Search for our outputs in last few blocks (up to 5 blocks), using provided address and viewkey.
 
-
 ```bash
-# testnet address
-curl  -w "\n" -X GET http://127.0.0.1:8081/api/outputsblocks?address=9sDyNU82ih1gdhDgrqHbEcfSDFASjFgxL9B9v5f1AytFUrYsVEj7bD9Pyx5Sw2qLk8HgGdFM8qj5DNecqGhm24Ce6QwEGDi&viewkey=807079280293998634d66e745562edaaca45c0a75c8290603578b54e9397e90a&limit=5&mempool=1
+curl  -w "\n" -X GET https://explorer.ryo-currency.com/api/outputsblocks?address=RYoLshW4LVn8TurtCrZzAd79FURtPHb93ATRYch3JpSDgvPRubk1VeEKg33sVifjASf7NzZtgQ6urVAAAKDKDtmUiDraNbdDvyk&viewkey=807079280293998634d66e745562edaaca45c0a75c8290603578b54e9397e90a&limit=5&mempool=1
 ```
 
 Example result:
 
 ```json
-{
 {
   "data": {
     "address": "0182d5be0f708cecf2b6f9889738bde5c930fad846d5b530e021afd1ae7e24a687ad50af3a5d38896655669079ad0163b4a369f6c852cc816dace5fc7792b72f",
@@ -739,42 +693,44 @@ Example result:
 }
 ```
 
+---
+
 #### api/emission
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/emission"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/emission"
 ```
 
 ```json
 {
-  "data": {
-    "blk_no": 1313969,
-    "coinbase": 14489473877253413000,
-    "fee": 52601974988641130
-  },
-  "status": "success"
+   "data":{
+      "blk_no":156852,
+      "coinbase":14364698360000000,
+      "fee":5547807947200
+   },
+   "status":"success"
 }
 ```
 
-Emission only works when the emission monitoring thread is enabled.
+---
 
 #### api/version
 
 ```bash
-curl  -w "\n" -X GET "http://127.0.0.1:8081/api/version"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/version"
 ```
 
 ```json
 {
-  "data": {
-    "api": 65536,
-    "blockchain_height": 1357031,
-    "git_branch_name": "update_to_current_monero",
-    "last_git_commit_date": "2017-07-25",
-    "last_git_commit_hash": "a549f25",
-    "monero_version_full": "0.10.3.1-ab594cfe"
-  },
-  "status": "success"
+   "data":{
+      "api":65536,
+      "blockchain_height":156853,
+      "git_branch_name":"templates",
+      "last_git_commit_date":"2018-07-02",
+      "last_git_commit_hash":"70be873",
+      "monero_version_full":"0.2.0.0-fb56bed"
+   },
+   "status":"success"
 }
 ```
 
@@ -787,32 +743,26 @@ var api_major = response.data.api >> 16;
 var api_minor = response.data.api & 0xffff;
 ```
 
+---
+
 #### api/rawblock/<block_number|block_hash>
 
-Return raw json block data, as represented in Monero.
+Return raw json block data, as represented in Ryo.
 
 ```bash
-curl  -w "\n" -X GET "http://139.162.32.245:8081/api/rawblock/1293257"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/rawblock/150000"
 ```
 
 Example result not shown.
+
+---
 
 #### api/rawtransaction/<tx_hash>
 
-Return raw json tx data, as represented in Monero.
+Return raw json tx data, as represented in Ryo.
 
 ```bash
-curl  -w "\n" -X GET "http://139.162.32.245:8081/api/rawtransaction/6093260dbe79fd6277694d14789dc8718f1bd54457df8bab338c2efa3bb0f03d"
+curl  -w "\n" -X GET "https://explorer.ryo-currency.com/api/rawtransaction/4307e5619b29dcc1d9cdf4a52b3d0717bcbab0efc06d88fb79a1e0e33594e6ec"
 ```
 
 Example result not shown.
-
-## Other monero examples
-
-Other examples can be found on  [github](https://github.com/moneroexamples?tab=repositories).
-Please know that some of the examples/repositories are not
-finished and may not work as intended.
-
-## How can you help?
-
-Constructive criticism, code and website edits are always good. They can be made through github.
