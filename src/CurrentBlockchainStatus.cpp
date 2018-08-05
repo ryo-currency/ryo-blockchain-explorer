@@ -139,7 +139,7 @@ CurrentBlockchainStatus::calculate_emission_in_blocks(
 
         if(start_blk == 0 && coinbase_amount == 8800000000000000)
         {
-            coinbase_amount = 100000000000000;
+            coinbase_amount = 99948553572999;
         }
 
         std::list<transaction> txs;
