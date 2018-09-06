@@ -1889,7 +1889,7 @@ public:
             }
 
             // if mine output has RingCT, i.e., tx version is 2
-            if (mine_output && tx.version == 2)
+            if (mine_output)
             {
                 // cointbase txs have amounts in plain sight.
                 // so use amount from ringct, only for non-coinbase txs
@@ -1915,11 +1915,6 @@ public:
                     outp.second         = rct_amount;
                     money_transfered[output_idx] = rct_amount;
                 }
-
-            }
-
-            if (mine_output)
-            {
                 sum_xmr += outp.second;
             }
 
@@ -2169,7 +2164,7 @@ public:
                     }
 
 
-                    if (mine_output && mixin_tx.version == 2)
+                    if (mine_output)
                     {
                         // cointbase txs have amounts in plain sight.
                         // so use amount from ringct, only for non-coinbase txs
@@ -2241,15 +2236,7 @@ public:
                             // in key image without spend key, so we just use all
                             // for regular/old txs there must be also a match
                             // in amounts, not only in output public keys
-                            if (mixin_tx.version < 2 && amount == in_key.amount)
-                            {
-                                sum_mixin_xmr += amount;
-                            }
-                            else if (mixin_tx.version == 2) // ringct
-                            {
-                                sum_mixin_xmr += amount;
-                            }
-
+                            sum_mixin_xmr += amount;
                             no_of_matched_mixins++;
                         }
 
@@ -4937,7 +4924,7 @@ public:
             }
 
             // if mine output has RingCT, i.e., tx version is 2
-            if (mine_output && tx.version == 2)
+            if (mine_output)
             {
                 // cointbase txs have amounts in plain sight.
                 // so use amount from ringct, only for non-coinbase txs
@@ -4965,7 +4952,7 @@ public:
 
                 } // if (!is_coinbase(tx))
 
-            }  // if (mine_output && tx.version == 2)
+            }
 
             j_outptus.push_back(json {
                     {"output_pubkey", pod_to_hex(outp.first.key)},
@@ -5388,7 +5375,7 @@ private:
                 }
 
                 // if mine output has RingCT, i.e., tx version is 2
-                if (mine_output && tx.version == 2)
+                if (mine_output)
                 {
                     // cointbase txs have amounts in plain sight.
                     // so use amount from ringct, only for non-coinbase txs
