@@ -1735,6 +1735,7 @@ public:
         }
 
         string tx_blk_height_str {"N/A"};
+        bool is_mined = false;
 
         if (tx_blk_found)
         {
@@ -1744,6 +1745,8 @@ public:
             blk_timestamp = xmreg::timestamp_to_str_gm(blk.timestamp);
 
             tx_blk_height_str = std::to_string(tx_blk_height);
+
+            is_mined = true;
         }
 
         // payments id. both normal and encrypted (payment_id8)
@@ -1773,6 +1776,7 @@ public:
                 {"viewkey"              , viewkey_str_partial},
                 {"tx_pub_key"           , pod_to_hex(txd.pk)},
                 {"blk_height"           , tx_blk_height_str},
+                {"is_mined"             , is_mined},
                 {"tx_size"              , fmt::format("{:0.4f}",
                                                       static_cast<double>(txd.size) / 1024.0)},
                 {"tx_fee"               , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", true)},
@@ -2453,7 +2457,7 @@ public:
 
                     mstch::map tx_cd_data {
                             {"no_of_sources"      , static_cast<uint64_t>(no_of_sources)},
-                            {"use_rct"            , tx_cd.use_rct},
+                            {"use_rct"            , true},
                             {"change_amount"      , xmreg::xmr_amount_to_str(tx_change.amount)},
                             {"has_payment_id"     , (payment_id  != null_hash)},
                             {"has_payment_id8"    , (payment_id8 != null_hash8)},
@@ -5649,6 +5653,7 @@ private:
         }
 
         string tx_blk_height_str {"N/A"};
+        bool is_mined = false;
 
         // tx age
         pair<string, string> age;
@@ -5663,6 +5668,8 @@ private:
             blk_timestamp = xmreg::timestamp_to_str_gm(blk.timestamp);
 
             tx_blk_height_str = std::to_string(tx_blk_height);
+
+            is_mined = true;
         }
 
         // payments id. both normal and encrypted (payment_id8)
@@ -5687,6 +5694,7 @@ private:
                 {"tx_prefix_hash"        , string{}},
                 {"tx_pub_key"            , pod_to_hex(txd.pk)},
                 {"blk_height"            , tx_blk_height_str},
+                {"is_mined"              , is_mined},
                 {"tx_blk_height"         , tx_blk_height},
                 {"tx_size"               , fmt::format("{:0.4f}", tx_size)},
                 {"tx_fee"                , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", false)},
