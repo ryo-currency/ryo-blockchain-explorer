@@ -1750,8 +1750,13 @@ public:
         }
 
         // payments id. both normal and encrypted (payment_id8)
-        string pid_str   = pod_to_hex(txd.payment_id);
-        string pid8_str  = pod_to_hex(txd.payment_id8);
+        crypto::hash payment_id   = null_hash;
+        crypto::hash8 payment_id8 = null_hash8;
+
+        get_payment_id(tx, payment_id, payment_id8);
+
+        string pid_str   = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id));
+        string pid8_str  = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id8));
 
         string shortcut_url = domain
                               + (tx_prove ? "/prove" : "/myoutputs")
@@ -1783,11 +1788,12 @@ public:
                 {"blk_timestamp"        , blk_timestamp},
                 {"delta_time"           , age.first},
                 {"outputs_no"           , static_cast<uint64_t>(txd.output_pub_keys.size())},
-                {"has_payment_id"       , txd.payment_id  != null_hash},
-                {"has_payment_id8"      , txd.payment_id8 != null_hash8},
+                {"has_payment_id"       , (payment_id  != null_hash)},
+                {"has_payment_id8"      , (payment_id8 != null_hash8)},
                 {"payment_id"           , pid_str},
                 {"payment_id8"          , pid8_str},
                 {"decrypted_payment_id8", string{}},
+                {"uniform_payment_id"   , string{}},
                 {"tx_prove"             , tx_prove},
                 {"shortcut_url"         , shortcut_url}
         };
@@ -1846,6 +1852,26 @@ public:
             if (mcore->get_device()->decrypt_payment_id(decrypted_payment_id8, pub_key, prv_view_key))
             {
                 context["decrypted_payment_id8"] = pod_to_hex(decrypted_payment_id8);
+            }
+        }
+
+        // decrypt uniform payment_id
+        if(payment_id == null_hash && payment_id8 == null_hash8)
+        {
+            std::vector<tx_extra_field> tx_extra_fields;
+            if(parse_tx_extra(tx.extra, tx_extra_fields))
+            {
+                tx_extra_uniform_payment_id uniform_pid;
+                if(get_payment_id_from_tx_extra(tx_extra_fields, uniform_pid))
+                {
+                    if (mcore->get_device()->decrypt_payment_id(uniform_pid.pid, pub_key, prv_view_key))
+                    {
+                        if(uniform_pid.pid.zero == 0)
+                        {
+                            context["uniform_payment_id"] = pod_to_hex(uniform_pid.pid.payment_id);
+                        }
+                    }
+                }
             }
         }
 
@@ -2448,7 +2474,7 @@ public:
                     crypto::hash payment_id   = null_hash;
                     crypto::hash8 payment_id8 = null_hash8;
 
-                    get_payment_id(tx_cd.extra, payment_id, payment_id8);
+                    get_payment_id(tx_cd, payment_id, payment_id8);
 
                     // payments id. both normal and encrypted (payment_id8)
                     string pid_str   = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id));
@@ -5708,6 +5734,7 @@ private:
                 {"outputs_no"            , static_cast<uint64_t>(txd.output_pub_keys.size())},
                 {"has_payment_id"        , txd.payment_id  != null_hash},
                 {"has_payment_id8"       , txd.payment_id8 != null_hash8},
+                {"has_uniform_payment_id", txd.pID == 'u'},
                 {"confirmations"         , txd.no_confirmations},
                 {"payment_id"            , pid_str},
                 {"payment_id_as_ascii"   , remove_bad_chars(txd.payment_id_as_ascii)},
@@ -6186,6 +6213,14 @@ private:
             // mark it so that it represents that it has at least
             // one sub-address
             txd.pID = 's';
+        }
+        else
+        {
+            tx_extra_uniform_payment_id uniform_pid;
+            if(get_payment_id_from_tx_extra(tx.extra, uniform_pid))
+            {
+                txd.pID = 'u'; // uniform payment id
+            }
         }
 
         // get tx signatures for each input

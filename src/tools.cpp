@@ -773,7 +773,34 @@ get_key_images(const transaction& tx)
 
 
 bool
-get_payment_id(const vector<uint8_t>& extra,
+get_payment_id(const ::tools::wallet2::tx_construction_data& tx_cd,
+               crypto::hash& payment_id,
+               crypto::hash8& payment_id8)
+{
+    payment_id = null_hash;
+    payment_id8 = null_hash8;
+
+    if(tx_cd.payment_id.zero == 0)
+    {
+        const uint64_t* split_id = reinterpret_cast<const uint64_t*>(&tx_cd.payment_id.payment_id);
+        if(split_id[1] == 0 && split_id[2] ==  0 && split_id[3] == 0)
+        {
+            memcpy(&payment_id8, &tx_cd.payment_id.payment_id, sizeof(crypto::hash8));
+            return true;
+        }
+        else
+        {
+            memcpy(&payment_id, &tx_cd.payment_id.payment_id, sizeof(crypto::hash));
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+bool
+get_payment_id(const transaction& tx,
                crypto::hash& payment_id,
                crypto::hash8& payment_id8)
 {
@@ -782,7 +809,7 @@ get_payment_id(const vector<uint8_t>& extra,
 
     std::vector<tx_extra_field> tx_extra_fields;
 
-    if(!parse_tx_extra(extra, tx_extra_fields))
+    if(!parse_tx_extra(tx.extra, tx_extra_fields))
     {
         return false;
     }
@@ -801,17 +828,7 @@ get_payment_id(const vector<uint8_t>& extra,
             return true;
         }
     }
-
     return false;
-}
-
-
-bool
-get_payment_id(const transaction& tx,
-               crypto::hash& payment_id,
-               crypto::hash8& payment_id8)
-{
-    return get_payment_id(tx.extra, payment_id, payment_id8);
 }
 
 
