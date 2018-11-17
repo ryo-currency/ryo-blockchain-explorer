@@ -419,12 +419,13 @@ main(int ac, const char* av[])
             }
 
             string raw_tx_data = remove_bad_chars(post_body["rawtxdata"]);
+            string viewkey     = remove_bad_chars(post_body["viewkey"]);
             string action      = remove_bad_chars(post_body["action"]);
 
             if (action == "check")
-                return xmrblocks.show_checkrawtx(raw_tx_data, action);
+                return xmrblocks.show_checkrawtx(raw_tx_data, viewkey);
             else if (action == "push")
-                return xmrblocks.show_pushrawtx(raw_tx_data, action);
+                return xmrblocks.show_pushrawtx(raw_tx_data, viewkey);
             return string("Provided action is neither check nor push");
 
         });

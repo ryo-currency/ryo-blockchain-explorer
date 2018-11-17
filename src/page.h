@@ -2345,7 +2345,7 @@ public:
     }
 
     string
-    show_checkrawtx(string raw_tx_data, string action)
+    show_checkrawtx(string raw_tx_data, string viewkey_str)
     {
         clean_post_data(raw_tx_data);
 
@@ -2389,7 +2389,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Cant parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate unsigned tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::unsigned_tx_set exported_txs;
 
@@ -2635,8 +2660,13 @@ public:
             else
             {
                 cerr << "deserialization of unsigned tx data NOT successful" << endl;
-                return string("deserialization of unsigned tx data NOT successful. "
-                                      "Maybe its not base64 encoded?");
+                string error_msg = fmt::format("Deserialization of unsigned tx data NOT successful. "
+                                               "Maybe it's not base64 encoded?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
             }
         } // if (unsigned_tx_given)
         else
@@ -2666,13 +2696,15 @@ public:
 
                 if (!epee::string_tools::parse_hexstr_to_binbuff(raw_tx_data, tx_data_blob))
                 {
-                    string msg = fmt::format("The data is neither unsigned, signed tx or raw tx! "
-                                                     "Its prefix is: {:s}",
-                                             data_prefix);
+                    string error_msg = fmt::format("The data is neither unsigned, signed tx or raw tx! "
+                                                   "It's prefix is: {:s}", data_prefix);
 
-                    cout << msg << endl;
+                    cout << error_msg << endl;
 
-                    return string(msg);
+                    context["has_error"] = true;
+                    context["error_msg"] = error_msg;
+
+                    return mstch::render(full_page, context);
                 }
 
                 crypto::hash tx_hash_from_blob;
@@ -2736,7 +2768,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate signed tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::signed_tx_set signed_txs;
 
@@ -2756,8 +2813,13 @@ public:
             if (!r)
             {
                 cerr << "deserialization of signed tx data NOT successful" << endl;
-                return string("deserialization of signed tx data NOT successful. "
-                                      "Maybe its not base64 encoded?");
+                string error_msg = fmt::format("Deserialization of signed tx data NOT successful. "
+                                               "Maybe it's not base64 encoded?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
             }
 
             std::vector<tools::wallet2::pending_tx> ptxs = signed_txs.ptx;
@@ -2983,7 +3045,7 @@ public:
     }
 
     string
-    show_pushrawtx(string raw_tx_data, string action)
+    show_pushrawtx(string raw_tx_data, string viewkey_str)
     {
         clean_post_data(raw_tx_data);
 
@@ -3048,7 +3110,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate signed tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::signed_tx_set signed_txs;
 
@@ -3069,7 +3156,7 @@ public:
             if (!r)
             {
                 string error_msg = fmt::format("Deserialization of signed tx data NOT successful! "
-                                                       "Maybe its not base64 encoded?");
+                                                       "Maybe it's not base64 encoded?");
 
                 context["has_error"] = true;
                 context["error_msg"] = error_msg;
