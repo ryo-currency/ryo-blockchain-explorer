@@ -833,9 +833,9 @@ public:
         pair<string, string> network_info_age = get_age(local_copy_server_timestamp,
                                                         current_network_info.info_timestamp);
 
-        // if network info is younger than 2 minute, assume its current. No sense
-        // showing that it is not current if its less then block time.
-        if (local_copy_server_timestamp - current_network_info.info_timestamp < 120)
+        // if network info is younger than 4 minute, assume it's current. No sense
+        // showing that it is not current if it's less then block time.
+        if (local_copy_server_timestamp - current_network_info.info_timestamp < 240)
         {
             current_network_info.current = true;
         }
@@ -1784,7 +1784,7 @@ public:
                 {"is_mined"             , is_mined},
                 {"tx_size"              , fmt::format("{:0.4f}",
                                                       static_cast<double>(txd.size) / 1024.0)},
-                {"tx_fee"               , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", true)},
+                {"tx_fee"               , xmreg::xmr_amount_to_str(txd.fee, "{:0.9f}", true)},
                 {"blk_timestamp"        , blk_timestamp},
                 {"delta_time"           , age.first},
                 {"outputs_no"           , static_cast<uint64_t>(txd.output_pub_keys.size())},
@@ -2321,7 +2321,7 @@ public:
         context["show_inputs"]   = show_key_images;
         context["inputs_no"]     = static_cast<uint64_t>(inputs.size());
         context["sum_mixin_xmr"] = xmreg::xmr_amount_to_str(
-                sum_mixin_xmr, "{:0.12f}", false);
+                sum_mixin_xmr, "{:0.9f}", false);
 
 
         uint64_t possible_spending  {0};
@@ -2337,7 +2337,7 @@ public:
         }
 
         context["possible_spending"] = xmreg::xmr_amount_to_str(
-                possible_spending, "{:0.12f}", false);
+                possible_spending, "{:0.9f}", false);
 
         add_css_style(context);
 
@@ -5778,12 +5778,12 @@ private:
                 {"is_mined"              , is_mined},
                 {"tx_blk_height"         , tx_blk_height},
                 {"tx_size"               , fmt::format("{:0.4f}", tx_size)},
-                {"tx_fee"                , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", false)},
-                {"payed_for_kB"          , fmt::format("{:0.12f}", payed_for_kB)},
+                {"tx_fee"                , xmreg::xmr_amount_to_str(txd.fee, "{:0.9f}", false)},
+                {"payed_for_kB"          , fmt::format("{:0.9f}", payed_for_kB)},
                 {"tx_version"            , static_cast<uint64_t>(txd.version)},
                 {"blk_timestamp"         , blk_timestamp},
                 {"blk_timestamp_uint"    , blk.timestamp},
-                {"delta_time"            , age.first},
+                {"delta_time"            , age.first == "" ? "N/A" : age.first},
                 {"inputs_no"             , static_cast<uint64_t>(txd.input_key_imgs.size())},
                 {"has_inputs"            , !txd.input_key_imgs.empty()},
                 {"outputs_no"            , static_cast<uint64_t>(txd.output_pub_keys.size())},
