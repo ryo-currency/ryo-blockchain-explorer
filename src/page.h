@@ -3783,19 +3783,59 @@ public:
         result_html = default_txt;
 
 
-        // check if monero address is given based on its length
+        // check if ryo address is given based on its length
         // if yes, then we can only show its public components
-        if (search_str_length == 95)
+        if (search_str_length == 99)
         {
-            // parse string representing given monero address
+            // parse string representing given ryo address
             address_parse_info address_info;
 
             cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
 
-            if (search_text[0] == '9' || search_text[0] == 'A' || search_text[0] == 'B')
+            if(search_text.substr(0,4) == "Suto" ||
+               search_text.substr(0,4) == "Susu" ||
+               search_text.substr(0,4) == "RYoT" ||
+               search_text.substr(0,4) == "RYoU")
+            {
                 nettype_addr = cryptonote::network_type::TESTNET;
-            if (search_text[0] == '5' || search_text[0] == '7')
+            }
+
+            if(search_text.substr(0,5) == "RYosT" ||
+               search_text.substr(0,5) == "RYosU")
+            {
                 nettype_addr = cryptonote::network_type::STAGENET;
+            }
+
+            if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
+            {
+                cerr << "Cant parse string address: " << search_text << endl;
+                return string("Cant parse address (probably incorrect format): ")
+                       + search_text;
+            }
+
+            return show_address_details(address_info, nettype_addr);
+        }
+
+        // check if kurz ryo address is given based on its length
+        // if yes, then show its public components
+        if (search_str_length == 55)
+        {
+            // parse string representing given ryo address
+            address_parse_info address_info;
+
+            cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
+
+            if(search_text.substr(0,4) == "RYoG" ||
+               search_text.substr(0,4) == "RYoH")
+            {
+                nettype_addr = cryptonote::network_type::TESTNET;
+            }
+
+            if(search_text.substr(0,5) == "RYosG" ||
+               search_text.substr(0,5) == "RYosK")
+            {
+                nettype_addr = cryptonote::network_type::STAGENET;
+            }
 
             if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
             {
@@ -3809,14 +3849,27 @@ public:
 
         // check if integrated monero address is given based on its length
         // if yes, then show its public components search tx based on encrypted id
-        if (search_str_length == 106)
+        if (search_str_length == 110)
         {
 
             cryptonote::account_public_address address;
 
             address_parse_info address_info;
 
-            if (!get_account_address_from_str(nettype, address_info, search_text))
+            cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
+
+            if(search_text.substr(0,4) == "Suti" ||
+               search_text.substr(0,4) == "RYoE")
+            {
+                nettype_addr = cryptonote::network_type::TESTNET;
+            }
+
+            if(search_text.substr(0,5) == "RYosE")
+            {
+                nettype_addr = cryptonote::network_type::STAGENET;
+            }
+
+            if (!get_account_address_from_str(nettype_addr, address_info, search_text))
             {
                 cerr << "Cant parse string integerated address: " << search_text << endl;
                 return string("Cant parse address (probably incorrect format): ")
@@ -3825,7 +3878,7 @@ public:
 
             return show_integrated_address_details(address_info,
                                                    address_info.payment_id,
-                                                   nettype);
+                                                   nettype_addr);
         }
 
         // all_possible_tx_hashes was field using custom lmdb database
@@ -3850,9 +3903,10 @@ public:
                 {"xmr_address"        , REMOVE_HASH_BRAKETS(address_str)},
                 {"public_viewkey"     , REMOVE_HASH_BRAKETS(pub_viewkey_str)},
                 {"public_spendkey"    , REMOVE_HASH_BRAKETS(pub_spendkey_str)},
+                {"is_kurz_addr"       , pub_viewkey_str == pub_spendkey_str},
                 {"is_integrated_addr" , false},
-                {"testnet"            , testnet},
-                {"stagenet"           , stagenet},
+                {"testnet"            , nettype == cryptonote::network_type::TESTNET},
+                {"stagenet"           , nettype == cryptonote::network_type::STAGENET},
         };
 
         add_css_style(context);
@@ -3878,9 +3932,10 @@ public:
                 {"public_viewkey"       , REMOVE_HASH_BRAKETS(pub_viewkey_str)},
                 {"public_spendkey"      , REMOVE_HASH_BRAKETS(pub_spendkey_str)},
                 {"encrypted_payment_id" , REMOVE_HASH_BRAKETS(enc_payment_id_str)},
+                {"is_kurz_addr"         , false},
                 {"is_integrated_addr"   , true},
-                {"testnet"              , testnet},
-                {"stagenet"             , stagenet},
+                {"testnet"              , nettype == cryptonote::network_type::TESTNET},
+                {"stagenet"             , nettype == cryptonote::network_type::STAGENET},
         };
 
         add_css_style(context);
