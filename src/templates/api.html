@@ -110,7 +110,8 @@
 </code></pre>
 <p>Result analogical to the one above.</p>
 <hr>
-<h4>api/block/&lt;block_number|block_hash&gt;</h4>
+<h4>api/block/&lt;block_number&gt;</h4>
+<h4>api/block/&lt;block_hash&gt;</h4>
 <pre><code class="language-bash">curl  -w <span class="hljs-string">"\n"</span> -X GET <span class="hljs-string">"https://explorer.ryo-currency.com/api/block/150000"</span>
 </code></pre>
 <p>Partial results shown:</p>
@@ -185,7 +186,9 @@
 </code></pre>
 <p>Result analogical to the one above.</p>
 <hr>
-<h4>api/search/&lt;block_number|tx_hash|block_hash&gt;</h4>
+<h4>api/search/&lt;block_number&gt;</h4>
+<h4>api/search/&lt;tx_hash&gt;</h4>
+<h4>api/search/&lt;block_hash&gt;</h4>
 <pre><code class="language-bash">curl  -w <span class="hljs-string">"\n"</span> -X GET <span class="hljs-string">"https://explorer.ryo-currency.com/api/search/150000"</span>
 </code></pre>
 <p>Partial results shown:</p>
@@ -219,7 +222,7 @@
     </span>}
 </code></pre>
 <hr>
-<h4>api/outputs?txhash=&lt;tx_hash&gt;&amp;address=<address>&amp;viewkey=<viewkey>&amp;txprove=&lt;0|1&gt;</viewkey></address></h4>
+<h4>api/outputs?txhash=&lt;tx_hash&gt;&amp;address=&lt;address&gt;&amp;viewkey=&lt;viewkey&gt;&amp;txprove=&lt;0|1&gt;</h4>
 <p>For <code>txprove=0</code> we check which outputs belong to given address and corresponding viewkey.
   For <code>txprove=1</code> we use to prove to the recipient that we sent them founds.
   For this, we use recipient's address and our tx private key as a viewkey value,
@@ -398,7 +401,8 @@
     <span class="hljs-keyword">var</span> api_minor = response.data.api &amp; <span class="hljs-number">0xffff</span>;
 </code></pre>
 <hr>
-<h4>api/rawblock/&lt;block_number|block_hash&gt;</h4>
+<h4>api/rawblock/&lt;block_number&gt;</h4>
+<h4>api/rawblock/&lt;block_hash&gt;</h4>
 <p>Return raw json block data, as represented in Ryo.</p>
 <pre><code class="language-bash">curl  -w <span class="hljs-string">"\n"</span> -X GET <span class="hljs-string">"https://explorer.ryo-currency.com/api/rawblock/150000"</span>
 </code></pre>

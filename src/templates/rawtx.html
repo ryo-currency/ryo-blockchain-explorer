@@ -1,38 +1,96 @@
 <div>
 
-  <div>
-    <br/>
-    <h3>Transaction Pusher</h3>
+  <div class="table-header">
+    Transaction Pusher
   </div>
 
-  <div>
+  <div class="table-scroller padding">
     <form action="/checkandpush" method="post" class="pure-form">
-      <p>
-        Paste here either a hex string of raw transaction<br/>
-        (the <i>tx_blob</i> response in the wallet RPC, or the <i>raw_ryo_tx</i>
-        file saved by the wallet CLI with <i>--do-not-relay</i> option specified),<br/>
-        or base64 encoded, unsigned or signed transaction data<br/>
-        <br/>
-        (In Linux, can get the raw tx data: <i>cat raw_ryo_tx | xclip -selection clipboard</i>)<br/>
-        (In Windows, can get the raw tx data: <i>certutil.exe -encode -f raw_ryo_tx encoded.txt & type "encoded.txt" | clip</i>)
-      </p>
 
-      <textarea name="rawtxdata" style="width:100%;height:400px;"></textarea>
+      <p>
+        <textarea placeholder="Hex string of raw transaction, or signed / unsigned tx set" name="rawtxdata"></textarea>
+      </p>
       
       <p>
-      Note: data is sent to the server, as the calculations are done on the server side
-      <br/>
-      Note: "check" does not work for the hex string of raw transaction
+        <input type="text" placeholder="Private viewkey (only needed for signed / unsigned tx set)" name="viewkey" class="pure-input-1" />
       </p>
-      <div class="pure-g">
-	<div class="pure-u-1-2">
-	  <input type="submit" name="action" value="check" class="pure-button pure-button-active" />
-	</div>
-	<div class="pure-u-1-2">
-	  <input type="submit" name="action" value="push" class="pure-button pure-button-active" />
-	</div>
+      
+      <div class="buttons-container">
+	<input type="submit" name="action" value="check" class="pure-button pure-button-active" />
+	<input type="submit" name="action" value="push" class="pure-button pure-button-active" />
+      </div>
+      
     </form>
   </div>
 
-  <br/>
+
+  <div class="table-header">
+    Instructions
+  </div>
+
+  <div class="table-scroller padding">
+    <h4>Obtaining hex string of raw transaction from CLI wallet</h4>
+    <ul>
+      <li>
+        From <code>ryo-wallet-cli --do-not-relay</code> create a transaction which will be written to a file
+      </li>
+      <li>
+        On Linux terminal, type <code>cat raw_ryo_tx | xclip -selection clipboard</code>
+      </li>
+      <li>
+        On Windows command line, type <code>certutil.exe -encode -f raw_ryo_tx encoded.txt & type "encoded.txt" | clip</code>
+      </li>
+    </ul>
+
+    <h4>Obtaining hex string of raw transaction from RPC wallet</h4>
+    <ul>
+      <li>
+        Run <code>ryo-wallet-rpc</code> and create a transaction with the <code>do_not_relay</code> and <code>get_tx_hex</code> parameters set to <code>true</code>
+      </li>
+      <li>
+        Paste the output of <code>tx_blob</code> into the form above
+      </li>
+    </ul>
+
+    <h4>Obtaining unsigned tx set</h4>
+    <ul>
+      <li>
+        Run <code>ryo-wallet-cli</code> with a view-only wallet opened and create a transaction
+      </li>
+      <li>
+        On Linux terminal, type <code>base64 unsigned_ryo_tx | xclip -selection clipboard</code>
+      </li>
+      <li>
+        On Windows command line, type <code>certutil.exe -encode -f unsigned_ryo_tx encoded.txt & type "encoded.txt" | clip</code>
+      </li>
+    </ul>
+
+    <h4>Obtaining signed tx set</h4>
+    <ul>
+      <li>
+        Run <code>ryo-wallet-cli</code> with the corresponding hot wallet and run <code>sign_transfer</code>
+      </li>
+      <li>
+        On Linux terminal, type <code>base64 signed_ryo_tx | xclip -selection clipboard</code>
+      </li>
+      <li>
+        On Windows command line, type <code>certutil.exe -encode -f signed_ryo_tx encoded.txt & type "encoded.txt" | clip</code>
+      </li>
+    </ul>
+    
+    <h4>Notes</h4>
+    <ul>
+      <li>
+        Viewkey is only needed for checking a signed / unsigned tx set or pushing a signed tx set made from a view-only wallet or corresponding hot wallet
+      </li>
+      <li>
+        Data is sent to the server, as the calculations are done on the server side
+      </li>
+      <li>
+        If submitting a signed / unsigned tx set, then the private tx key, recipients, and payment id will also be sent to the server
+      </li>
+    </ul>
+
+  </div>
+
 </div>

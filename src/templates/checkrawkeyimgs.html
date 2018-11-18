@@ -1,32 +1,63 @@
 <div>
 
-  <div>
-    <br/>
-    <h3>Signed Key Images Checker</h3>
+  <div class="table-header">
+    Signed Key Images Checker
   </div>
 
-  <h3>Data file prefix: {{data_prefix}}</h3>
+  <div class="table-scroller">
+    <div class="monospace pure-g">
 
-  {{#has_error}}
-  <h4 style="color:red">Attempt failed</h4>
-  <h4>{{error_msg}}</h4>
-  {{/has_error}}
-  {{^has_error}}
-  <h4>Key images for address: {{address}}</h4>
-  <h4>Viewkey: {{viewkey}}</h4>
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Data file prefix</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{data_prefix}}</span>
+      </div>
 
-  <div class="center">
+      {{#has_error}}
+      <div class="pure-u-1" style="color:red">
+        Attempt failed
+      </div>
+      <div class="pure-u-1">
+        {{error_msg}}
+      </div>
+      {{/has_error}}
+      
+      {{^has_error}}
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Key images for address</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{address}}</span>
+      </div>
 
-    <form action="/genrawkeyimgs" method="post" style="width:100%; margin-top:15px" class="style-1">
-      <table class="center" style="width:80%">
-        <tr>
-          <td>Key no.</td>
-          <td>Key image</td>
-          <td>Is spent?</td>
-        </tr>
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Viewkey</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{viewkey}}</span>
+      </div>
+      {{/has_error}}
+
+    </div>
+
+    {{^has_error}}
+    <div class="table-container">
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th style="width: 0px;"></th>
+            <th style="width: 80px;">Key no.</th>
+            <th>Key image</th>
+            <th style="width: 70px;">Is spent?</th>
+          </tr>
+        </thead>
+        <tbody>
         {{#key_imgs}}
-        <input type="hidden" id="key_img_{{key_image}}" name="key_sig_pair_{{key_image}}" value="{{signature}}">
         <tr>
+          <td>
+            <input type="hidden" id="key_img_{{key_image}}" name="key_sig_pair_{{key_image}}" value="{{signature}}">
+          </td>
           <td>{{key_no}}</td>
           <td>{{key_image}}</td>
           <td>
@@ -39,12 +70,10 @@
           </td>
         </tr>
         {{/key_imgs}}
+        </tbody>
       </table>
-      <br/>
-    </form>
-
+    </div>
+    {{/has_error}}
+    
   </div>
-
-  {{/has_error}}
-
 </div>
