@@ -47,6 +47,7 @@
 #define TMPL_ADDRESS                TMPL_DIR "/address.html"
 #define TMPL_MY_OUTPUTS             TMPL_DIR "/my_outputs.html"
 #define TMPL_SEARCH_RESULTS         TMPL_DIR "/search_results.html"
+#define TMPL_ERROR_PAGE             TMPL_DIR "/error_page.html"
 #define TMPL_API                    TMPL_DIR "/api.html"
 #define TMPL_MY_RAWTX               TMPL_DIR "/rawtx.html"
 #define TMPL_MY_CHECKRAWTX          TMPL_DIR "/checkrawtx.html"
@@ -413,6 +414,7 @@ public:
         template_file["checkoutputkeys"] = get_full_page(xmreg::read(TMPL_MY_CHECKRAWOUTPUTKEYS));
         template_file["address"]         = get_full_page(xmreg::read(TMPL_ADDRESS));
         template_file["search_results"]  = get_full_page(xmreg::read(TMPL_SEARCH_RESULTS));
+        template_file["error_page"]      = get_full_page(xmreg::read(TMPL_ERROR_PAGE));
         template_file["api"]             = get_full_page(xmreg::read(TMPL_API));
         template_file["tx_details"]      = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_details.html");
         template_file["tx_table_header"] = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_table_header.html");
@@ -1132,15 +1134,14 @@ public:
                  << " since its higher than current blockchain height"
                  << " i.e., " <<  current_blockchain_height
                  << endl;
-            return fmt::format("Can't get block {:d} since its higher than current blockchain height!",
-                               _blk_height);
+            return show_error_page("Block Information", fmt::format("Can't get block {:d} since it's higher than current blockchain height!", _blk_height));
         }
 
 
         if (!mcore->get_block_by_height(_blk_height, blk))
         {
             cerr << "Can't get block: " << _blk_height << endl;
-            return fmt::format("Can't get block {:d}!", _blk_height);
+            return show_error_page("Block Information", fmt::format("Can't get block {:d}!", _blk_height));
         }
 
         // get block's hash
@@ -1298,7 +1299,7 @@ public:
         if (!xmreg::parse_str_secret_key(_blk_hash, blk_hash))
         {
             cerr << "Can't parse blk hash: " << blk_hash << endl;
-            return fmt::format("Can't get block {:s} due to block hash parse error!", blk_hash);
+            return show_error_page("Block Information", fmt::format("Can't get block {:s} due to block hash parse error!", blk_hash));
         }
 
         uint64_t blk_height;
@@ -1310,7 +1311,7 @@ public:
         else
         {
             cerr << "Can't get block: " << blk_hash << endl;
-            return fmt::format("Can't get block {:s}", blk_hash);
+            return show_error_page("Block Information", fmt::format("Can't get block {:s}", blk_hash));
         }
 
         return show_block(blk_height);
@@ -1326,7 +1327,7 @@ public:
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
             cerr << "Can't parse tx hash: " << tx_hash_str << endl;
-            return string("Can't get tx hash due to parse error: " + tx_hash_str);
+            return show_error_page("Transaction details", "Can't get tx hash due to parse error: " + tx_hash_str);
         }
 
         // tx age
@@ -1371,7 +1372,7 @@ public:
             else
             {
                 // tx is nowhere to be found :-(
-                return string("Can't get tx: " + tx_hash_str);
+                return show_error_page("Transaction details", "Can't get tx: " + tx_hash_str);
             }
         }
 
@@ -1567,20 +1568,26 @@ public:
 
         if (tx_hash_str.empty())
         {
-            return string("tx hash not provided!");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "tx hash not provided!");
+            else
+                return show_error_page("Prove sending", "tx hash not provided!");
         }
 
         if (xmr_address_str.empty())
         {
-            return string("Ryo address not provided!");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Ryo address not provided!");
+            else
+                return show_error_page("Prove sending", "Ryo address not provided!");
         }
 
         if (viewkey_str.empty())
         {
             if (!tx_prove)
-                return string("Viewkey not provided!");
+                return show_error_page("Decode outputs", "Viewkey not provided!");
             else
-                return string("Tx private key not provided!");
+                return show_error_page("Prove sending", "Tx private key not provided!");
         }
 
         // parse tx hash string to hash object
@@ -1589,7 +1596,10 @@ public:
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
             cerr << "Can't parse tx hash: " << tx_hash_str << endl;
-            return string("Can't get tx hash due to parse error: " + tx_hash_str);
+            if (!tx_prove)
+                show_error_page("Decode outputs", "Can't get tx hash due to parse error: " + tx_hash_str);
+            else
+                show_error_page("Prove sending", "Can't get tx hash due to parse error: " + tx_hash_str);
         }
 
         // parse string representing given Ryo address
@@ -1598,7 +1608,10 @@ public:
         if (!xmreg::parse_str_address(xmr_address_str,  address_info, nettype))
         {
             cerr << "Can't parse string address: " << xmr_address_str << endl;
-            return string("Can't parse Ryo address: " + xmr_address_str);
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't parse Ryo address: " + xmr_address_str);
+            else
+                return show_error_page("Prove sending", "Can't parse Ryo address: " + xmr_address_str);
         }
 
         // parse string representing given private key
@@ -1609,7 +1622,10 @@ public:
         if (!xmreg::parse_str_secret_key(viewkey_str, multiple_tx_secret_keys))
         {
             cerr << "Can't parse the private key: " << viewkey_str << endl;
-            return string("Can't parse private key: " + viewkey_str);
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't parse private key: " + viewkey_str);
+            else
+                return show_error_page("Prove sending", "Can't parse private key: " + viewkey_str);
         }
         if (multiple_tx_secret_keys.size() == 1)
         {
@@ -1618,7 +1634,8 @@ public:
         else if (!tx_prove)
         {
             cerr << "Concatenated secret keys are only for tx proving!" << endl;
-            return string("Concatenated secret keys are only for tx proving!");
+
+            return show_error_page("Decode outputs", "Concatenated secret keys are only for tx proving!");
         }
 
 
@@ -1632,7 +1649,7 @@ public:
 //        if (!xmreg::parse_str_secret_key(spend_key_str, prv_spend_key))
 //        {
 //            cerr << "Can't parse the prv_spend_key : " << spend_key_str << endl;
-//            return string("Can't parse prv_spend_key : " + spend_key_str);
+//            return show_error_page("My outputs", "Can't parse prv_spend_key : " + spend_key_str);
 //        }
 
         // tx age
@@ -1705,7 +1722,10 @@ public:
             else
             {
                 // tx is nowhere to be found :-(
-                return string("Can't get tx: " + tx_hash_str);
+                if (!tx_prove)
+                    return show_error_page("Decode outputs", "Can't get tx: " + tx_hash_str);
+                else
+                    return show_error_page("Prove sending", "Can't get tx: " + tx_hash_str);
             }
         }
 
@@ -1811,8 +1831,8 @@ public:
 
         if (tx_prove && multiple_tx_secret_keys.size() != txd.additional_pks.size() + 1)
         {
-            return string("This transaction includes additional tx pubkeys whose "
-                           "size doesn't match with the provided tx secret keys");
+            return show_error_page("Prove sending", string("This transaction includes additional tx") +
+                                   string("pubkeys whose size doesn't match with the provided tx secret keys"));
         }
 
         public_key pub_key = tx_prove ? address_info.address.m_view_public_key : txd.pk;
@@ -1827,7 +1847,10 @@ public:
                  << "pub_tx_key: " << pub_key << " and "
                  << "prv_view_key" << prv_view_key << endl;
 
-            return string("Can't get key_derivation");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't get key_derivation");
+            else
+                return show_error_page("Prove sending", "Can't get key_derivation");
         }
 
         for (size_t i = 0; i < txd.additional_pks.size(); ++i)
@@ -1840,7 +1863,10 @@ public:
                      << "pub_tx_key: " << txd.additional_pks[i] << " and "
                      << "prv_view_key" << prv_view_key << endl;
 
-                return string("Can't get key_derivation");
+                if (!tx_prove)
+                    return show_error_page("Decode outputs", "Can't get key_derivation");
+                else
+                    return show_error_page("Prove sending", "Can't get key_derivation");
             }
         }
 
@@ -2554,7 +2580,7 @@ public:
 
                             cerr << out_msg << endl;
 
-                            return string(out_msg);
+                            return show_error_page("Transaction Pusher", out_msg);
                         }
 
 
@@ -2564,7 +2590,7 @@ public:
                         if (!mcore->get_tx(real_toi.first, real_source_tx))
                         {
                             cerr << "Can't get tx in blockchain: " << real_toi.first << endl;
-                            return string("Can't get tx: " + pod_to_hex(real_toi.first));
+                            return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                         }
 
                         tx_details real_txd = get_tx_details(real_source_tx);
@@ -2605,7 +2631,7 @@ public:
 
                                 cerr << out_msg << endl;
 
-                                return string(out_msg);
+                                return show_error_page("Transaction Pusher", out_msg);
                             }
 
                             transaction tx;
@@ -2615,7 +2641,7 @@ public:
                                 cerr << "Can't get tx in blockchain: " << toi.first
                                      << ". \n Check mempool now" << endl;
                                 // tx is nowhere to be found :-(
-                                return string("Can't get tx: " + pod_to_hex(toi.first));
+                                return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                             }
 
                             tx_details txd = get_tx_details(tx);
@@ -2629,7 +2655,7 @@ public:
                             if (!mcore->get_block_by_height(txd.blk_height, blk))
                             {
                                 cerr << "Can't get block: " << txd.blk_height << endl;
-                                return string("Can't get block: "  + to_string(txd.blk_height));
+                                return show_error_page("Transaction Pusher", "Can't get block: " + to_string(txd.blk_height));
                             }
 
                             pair<string, string> age = get_age(server_timestamp, blk.timestamp);
@@ -2970,13 +2996,13 @@ public:
 
                         cerr << out_msg << endl;
 
-                        return string(out_msg);
+                        return show_error_page("Transaction Pusher", out_msg);
                     }
 
                     if (!mcore->get_tx(real_toi.first, real_source_tx))
                     {
                         cerr << "Can't get tx in blockchain: " << real_toi.first << endl;
-                        return string("Can't get tx: " + pod_to_hex(real_toi.first));
+                        return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                     }
 
                     tx_details real_txd = get_tx_details(real_source_tx);
@@ -3809,8 +3835,7 @@ public:
             if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
             {
                 cerr << "Can't parse string address: " << search_text << endl;
-                return string("Can't parse address (probably incorrect format): ")
-                       + search_text;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
             }
 
             return show_address_details(address_info, nettype_addr);
@@ -3840,8 +3865,7 @@ public:
             if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
             {
                 cerr << "Can't parse string address: " << search_text << endl;
-                return string("Can't parse address (probably incorrect format): ")
-                       + search_text;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
             }
 
             return show_address_details(address_info, nettype_addr);
@@ -3872,8 +3896,7 @@ public:
             if (!get_account_address_from_str(nettype_addr, address_info, search_text))
             {
                 cerr << "Can't parse string integrated address: " << search_text << endl;
-                return string("Can't parse address (probably incorrect format): ")
-                       + search_text;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
             }
 
             return show_integrated_address_details(address_info,
@@ -4091,7 +4114,7 @@ public:
                         }
                         else
                         {
-                            return string("Can't get tx of hash (show_search_results): " + tx_hash);
+                            return show_error_page("Search", "Can't get tx of hash (show_search_results): " + tx_hash);
                         }
 
                         // tx in mempool have no blk_timestamp
@@ -4138,6 +4161,24 @@ public:
 
         // render the page
         return  mstch::render(full_page, context, partials);
+    }
+
+    string
+    show_error_page(const string title, const string message)
+    {
+
+        // initalise page tempate map with basic info about blockchain
+        mstch::map context {
+            {"error_title" , title},
+            {"error_msg"   , message}
+        };
+
+        add_css_style(context);
+
+        string full_page = template_file["error_page"];
+
+        // render the page
+        return  mstch::render(full_page, context);
     }
 
     string
