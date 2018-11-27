@@ -257,8 +257,8 @@ struct tx_details
 
             mixin_str        = std::to_string(mixin_no);
             fee_str          = fmt::format("{:0.6f}", xmr_amount);
-            fee_short_str    = fmt::format("{:0.3f}", xmr_amount);
-            payed_for_kB_str = fmt::format("{:0.3f}", payed_for_kB);
+            fee_short_str    = fmt::format("{:0.4f}", xmr_amount);
+            payed_for_kB_str = fmt::format("{:0.4f}", payed_for_kB);
         }
 
 
@@ -819,8 +819,9 @@ public:
                     txd_map.insert({"height"    , i});
                     txd_map.insert({"blk_hash"  , blk_hash_str});
                     txd_map.insert({"age"       , age.first});
-                    txd_map.insert({"is_ringct" , (tx.version > 1)});
+                    txd_map.insert({"is_ringct" , true});
                     txd_map.insert({"rct_type"  , tx.rct_signatures.type});
+                    txd_map.insert({"is_bp"     , tx.rct_signatures.type == rct::RCTTypeBulletproof});
                     txd_map.insert({"blk_size"  , blk_size_str});
 
 
@@ -5588,7 +5589,7 @@ public:
 
             string emission_blk_no   = std::to_string(current_values.blk_no - 1);
             string emission_coinbase = xmr_amount_to_str(current_values.coinbase, "{:0.3f}");
-            string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.3f}", false);
+            string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.4f}", false);
 
             j_data = json {
                     {"blk_no"  , current_values.blk_no - 1},
@@ -5986,8 +5987,9 @@ private:
                 {"with_ring_signatures"  , static_cast<bool>(
                                                    with_ring_signatures)},
                 {"tx_json"               , tx_json},
-                {"is_ringct"             , (tx.version > 1)},
+                {"is_ringct"             , true},
                 {"rct_type"              , tx.rct_signatures.type},
+                {"is_bp"                 , tx.rct_signatures.type == rct::RCTTypeBulletproof},
                 {"has_error"             , false},
                 {"error_msg"             , string("")},
                 {"have_raw_tx"           , false},
