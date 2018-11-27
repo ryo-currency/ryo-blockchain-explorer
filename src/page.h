@@ -31,6 +31,7 @@
 #include <ctime>
 #include <future>
 #include <mutex>
+#include <visitor/render_node.hpp>
 
 cn_pow_hash_v2 ctx;
 std::mutex m;
@@ -71,7 +72,7 @@ std::mutex m;
 #define JS_SHA3     TMPL_DIR "/js/sha3.js"
 
 #define ONIONEXPLORER_RPC_VERSION_MAJOR 1
-#define ONIONEXPLORER_RPC_VERSION_MINOR 0
+#define ONIONEXPLORER_RPC_VERSION_MINOR 1
 #define MAKE_ONIONEXPLORER_RPC_VERSION(major,minor) (((major)<<16)|(minor))
 #define ONIONEXPLORER_RPC_VERSION \
     MAKE_ONIONEXPLORER_RPC_VERSION(ONIONEXPLORER_RPC_VERSION_MAJOR, ONIONEXPLORER_RPC_VERSION_MINOR)
@@ -115,6 +116,68 @@ namespace std
             return h1 ^ (h2 << 1);
         };
     };
+}
+
+/**
+ * visitor to produce json representations of
+ * values stored in mstch::node
+ */
+class mstch_node_to_json: public boost::static_visitor<nlohmann::json> {
+public:
+
+    // enabled for numeric types
+    template<typename T>
+        std::enable_if_t<std::is_arithmetic<T>::value, nlohmann::json>
+        operator()(T const& value) const {
+        return nlohmann::json {value};
+    }
+
+    nlohmann::json operator()(std::string const& value) const {
+        return nlohmann::json {value};
+    }
+
+    nlohmann::json operator()(mstch::map const& n_map) const
+    {
+        nlohmann::json j;
+
+        for (auto const& kv: n_map)
+            j[kv.first] = boost::apply_visitor(mstch_node_to_json(), kv.second);
+
+        return j;
+    }
+
+    nlohmann::json operator()(mstch::array const& n_array) const
+    {
+        nlohmann::json j;
+
+        for (auto const& v:  n_array)
+            j.push_back(boost::apply_visitor(mstch_node_to_json(), v));
+
+        return j;
+
+    }
+
+    // catch other types that are non-numeric and not listed above
+    template<typename T>
+        std::enable_if_t<!std::is_arithmetic<T>::value, nlohmann::json>
+        operator()(const T&) const {
+        return nlohmann::json {};
+    }
+
+};
+
+namespace mstch
+{
+    namespace internal
+    {
+        // add conversion from mstch::map to nlohmann::json
+        void
+            to_json(nlohmann::json& j, mstch::map const &m)
+        {
+            for (auto const& kv: m)
+                j[kv.first] = boost::apply_visitor(mstch_node_to_json(), kv.second);
+        }
+    }
 }
 
 
@@ -4450,6 +4513,55 @@ public:
         return j_response;
     }
 
+    json
+    json_detailedtransaction(string tx_hash_str)
+    {
+        json j_response {
+            {"status", "fail"},
+            {"data"  , json {}}
+        };
+
+        json& j_data = j_response["data"];
+
+        transaction tx;
+
+        bool found_in_mempool {false};
+        uint64_t tx_timestamp {0};
+        string error_message;
+
+        if (!find_tx_for_json(tx_hash_str, tx, found_in_mempool, tx_timestamp, error_message))
+        {
+            j_data["title"] = error_message;
+            return j_response;
+        }
+
+        // get detailed tx information
+        mstch::map tx_context = construct_tx_context(tx, 1 /*full detailed */);
+
+        // remove some page specific and html stuff
+        tx_context.erase("timescales");
+        tx_context.erase("tx_json");
+        tx_context.erase("tx_json_raw");
+        tx_context.erase("enable_mixins_details");
+        tx_context.erase("with_ring_signatures");
+        tx_context.erase("show_part_of_inputs");
+        tx_context.erase("show_more_details_link");
+        tx_context.erase("max_no_of_inputs_to_show");
+        tx_context.erase("inputs_xmr_sum_not_zero");
+        tx_context.erase("have_raw_tx");
+        tx_context.erase("have_any_unknown_amount");
+        tx_context.erase("has_error");
+        tx_context.erase("error_msg");
+        tx_context.erase("server_time");
+        tx_context.erase("construction_time");
+
+        j_data = tx_context;
+
+        j_response["status"] = "success";
+
+        return j_response;
+    }
+
     /*
      * Lets use this json api convention for success and error
      * https://labs.omniti.com/labs/jsend
@@ -6378,6 +6490,31 @@ private:
         boost::erase_all(raw_tx_data, "-----END CERTIFICATE-----");
     }
 
+    bool
+    find_tx_for_json(
+        string const& tx_hash_str,
+        transaction& tx,
+        bool& found_in_mempool,
+        uint64_t& tx_timestamp,
+        string& error_message)
+    {
+        // parse tx hash string to hash object
+        crypto::hash tx_hash;
+
+        if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
+        {
+            error_message = fmt::format("Can't parse tx hash: {:s}", tx_hash_str);
+            return false;
+        }
+
+        if (!find_tx(tx_hash, tx, found_in_mempool, tx_timestamp))
+        {
+            error_message = fmt::format("Can't find tx hash: {:s}", tx_hash_str);
+            return false;
+        }
+
+        return true;
+    }
 
     bool
     search_mempool(crypto::hash tx_hash,
