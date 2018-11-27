@@ -44,6 +44,9 @@ namespace xmreg
         Blockchain&
         get_core();
 
+        tx_memory_pool&
+        get_mempool();
+
         bool
         get_block_by_height(const uint64_t& height, block& blk);
 
