@@ -29,6 +29,44 @@ a:hover, a:active {
     text-decoration:underline;
 }
 
+a.pure-button,
+a.pure-button:visited {
+    color: rgba(0,0,0,.8);
+    font-weight: normal;
+    text-decoration:none;
+}
+a.pure-button:hover, a.pure-button:active {
+    text-decoration:none;
+}
+
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.padding {
+    padding: .5em 1em;
+}
+
+.margin {
+    margin: 1em;
+}
+
+.monospace {
+    font-size: 0.8em;
+    font-family: monospace, monospace;
+}
+
+code {
+    color: #e83e8c;
+}
 
 .container {
     box-sizing: border-box;
@@ -50,6 +88,11 @@ a:hover, a:active {
 }
 .search input[type=text] {
     width: 100%;
+}
+
+textarea {
+    width:100%;
+    height:400px;
 }
 
 @media (min-width: 576px) {
@@ -99,13 +142,59 @@ a:hover, a:active {
     }
 }
 
+.buttons-container {
+    margin: 10px 0 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.table-header {
+    color: #fff;
+    background-color: #888;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-top: 20px;
+    padding: 8px 12.8px;
+    font-weight: bold;
+}
+
+.table-subheader {
+    background-color: #e0e0e0;
+    color: #000;
+    font-size: 0.8em;
+    font-family: monospace, monospace;
+    font-weight: 700;
+    padding: .5em 1em;
+}
+
+.table-footer {
+    color: #000;
+    font-size: 0.8em;
+    font-family: monospace, monospace;
+    padding: .5em 1em;
+}
+
 .table-scroller {
+    border: 1px solid #888;
     overflow-x:auto;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;
 }
+
+.table-scroller .pure-g > div {
+    box-sizing: border-box;
+    padding: .5em 1em;
+    display: flex;
+    align-items:center;
+}
+
+.table-scroller .pure-g > div:nth-child(4n+1),
+.table-scroller .pure-g > div:nth-child(4n+2){
+    background-color: #f2f2f2;
+}
+
 .table-container {
-    min-width:960px;
+    min-width:930px;
 }
 table {
     table-layout: fixed;
@@ -113,6 +202,14 @@ table {
     word-wrap: break-word;
     font-size: 0.8em;
     font-family: monospace, monospace;
+    border-width: 0 !important;
+}
+
+.multi-table-container table tbody {
+    border-bottom: 1px solid #888;
+}
+.multi-table-container table:last-child tbody {
+    border-bottom: 0px solid #888;
 }
 
 #pages {
@@ -180,7 +277,7 @@ footer small{
     position: relative;
     min-height: 300px; /* This part sucks */
     clear: both;
-    margin: 40px 0 25px;
+    margin: 40px 0 0;
 }
 
 .tabs input[type=text],

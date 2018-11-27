@@ -1,162 +1,291 @@
-
 <div>
 
-    <H4 style="margin:5px">Tx hash: <a href="/tx/{{tx_hash}}">{{tx_hash}}</a></H4>
-    <H5 style="margin:5px">Tx public key: {{tx_pub_key}}</H5>
+  <div class="table-header">
+    Transaction Details
+  </div>
+
+  <div class="table-scroller">
+
+    <div class="monospace pure-g">
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Tx hash</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span><a href="/tx/{{tx_hash}}">{{tx_hash}}</a></span>
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Tx public key</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{tx_pub_key}}</span>
+        <span id="add_tx_pub_keys" style="display: none;">{{add_tx_pub_keys}}</span>
+      </div>
+
+      {{#uniform_payment_id}}
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Uniform payment id</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span id="payment_id">{{uniform_payment_id}}</span>
+      </div>
+      {{/uniform_payment_id}}
+      
+      {{#has_payment_id}}
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Payment id</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span id="payment_id">{{payment_id}}</span>
+      </div>
+      {{/has_payment_id}}
+      
+      {{#has_payment_id8}}
+      {{^decrypted_payment_id8}}
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Payment id (encrypted)</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span id="payment_id">{{payment_id8}}</span>
+      </div>
+      {{/decrypted_payment_id8}}
+      {{#decrypted_payment_id8}}
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Payment id (decrypted)</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span id="payment_id">{{decrypted_payment_id8}} (value incorrect if you are not the recipient of the tx)</span>
+      </div>
+      {{/decrypted_payment_id8}}
+      {{/has_payment_id8}}
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Timestamp [UCT]</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_timestamp}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Age [y:d:h:m:s]</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{delta_time}}</span>
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Block</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        {{#is_mined}}
+        <span><a href="/block/{{blk_height}}">{{blk_height}}</a></span>
+        {{/is_mined}}
+        {{^is_mined}}
+        <span>{{blk_height}}</span>
+        {{/is_mined}}
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Fee</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{tx_fee}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Tx size</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{tx_size}} kB</span>
+      </div>
+      
+    </div>
+  </div>    
+  
+  {{^tx_prove}}
+  <div class="table-header">
+    Decode outputs
+  </div>
+  <div class="table-scroller">
+    <div class="monospace pure-g">
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Address</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{xmr_address}}</span>
+      </div>
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Viewkey</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{viewkey}}</span>
+      </div>
+      <div class="pure-u-1">
+        <a class="pure-button pure-button-active" href="{{shortcut_url}}" target="_blank">link to this page</a>
+      </div>
+    </div>
+  </div>
+  {{/tx_prove}}
+  
+  {{#tx_prove}}
+  <div class="table-header">
+    Prove sending
+  </div>
+  <div class="table-scroller">
+    <div class="monospace pure-g">
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Address</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{xmr_address}}</span>
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Tx private key</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{viewkey}}</span>
+      </div>
+      <div class="pure-u-1">
+        <a class="pure-button pure-button-active" href="{{shortcut_url}}" target="_blank">link to this page</a>
+      </div>
+    </div>
+  </div>
+  {{/tx_prove}}
+
+  
+  <div class="table-header">
+    Outputs ({{outputs_no}})
+  </div>
+
+  <div class="table-scroller">
+    <div class="table-container">
+      
+      <div class="table-subheader">
+        Sum Ryo from matched outputs (i.e., incoming Ryo):
+        {{#found_our_outputs}}
+        {{sum_xmr}}
+        {{/found_our_outputs}}
+        {{^found_our_outputs}}
+        0.000000000
+        {{/found_our_outputs}}
+      </div>
+
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>output public key</th>
+            <th style="width: 100px">amount</th>
+            <th style="width: 100px">output match?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#outputs}}
+          <tr>
+            <td>{{output_idx}}: {{out_pub_key}}</td>
+            <td>{{amount}}</td>
+            {{#mine_output}}
+            <td>
+              <span style="color: #008009;font-weight: bold">
+                {{mine_output}}
+              </span>
+            </td>
+            {{/mine_output}}
+            {{^mine_output}}
+            <td>{{mine_output}}</td>
+            {{/mine_output}}
+          </tr>
+          {{/outputs}}
+        </tbody>
+      </table>
+
+    </div>
+  </div>
 
 
-    {{#has_payment_id}}
-        <H5 style="margin:5px">Payment id: {{payment_id}}</H5>
-    {{/has_payment_id}}
+  {{#show_inputs}}
+  <div class="table-header">
+    Inputs ({{inputs_no}})
+  </div>
 
-    {{#has_payment_id8}}
-        {{^decrypted_payment_id8}}
-            <H5 style="margin:5px">Payment id (encrypted): {{payment_id8}}</H5>
-        {{/decrypted_payment_id8}}
-        {{#decrypted_payment_id8}}
-            <H5 style="margin:5px">Payment id (decrypted): {{decrypted_payment_id8}}
-                (value incorrect if you are not the recipient of the tx)</H5>
-        {{/decrypted_payment_id8}}
-    {{/has_payment_id8}}
+  <div class="table-scroller">
+    <div class="table-container multi-table-container">
+      
+      {{#inputs}}
+      <div class="table-subheader">
+        Key image: {{key_image}}, Amount {{key_image_amount}}
+      </div>
 
+      {{#mixins}}
+      {{#has_mixin_outputs}}
+      {{#mixin_outputs}}
+      <div class="table-subheader" style="font-weight: normal">
+        Ring member {{mixin_pub_key}} might use your outputs
+        <br/>
+        from tx of hash: <a href="/tx/{{mix_tx_hash}}">{{mix_tx_hash}}</a>
+        <br/>
+        tx public key: {{mix_tx_pub_key}}
+      </div>
+      {{#has_found_outputs}}
+      <table class="pure-table pure-table-striped">
+        <thead>
+          <tr>
+            <th>output public key</th>
+            <th style="width: 100px">amount</th>
+            <th style="width: 100px">output match?</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#found_outputs}}
+          <tr>
+            <td>{{my_public_key}}</td>
+            <td>{{amount}}</td>
+            <td>
+              {{#mine_output}}
+              <span style="color: #008009;font-weight: bold">{{mine_output}}</span>{{#out_in_match}}*{{/out_in_match}}
+              {{/mine_output}}
+              {{^mine_output}}
+              {{mine_output}}
+              {{/mine_output}}
+            </td>
+          </tr>
+          {{/found_outputs}}
+        </tbody>
+      </table>
+      {{/has_found_outputs}}
+      {{/mixin_outputs}}
+      {{/has_mixin_outputs}}
+      {{/mixins}}
+      {{/inputs}}
+      
+    </div>
+  </div>
+  
+  <div class="table-header">
+    Details
+  </div>
 
-    <table class="center" style="width: 80%; margin-top:10px">
+  <div class="table-scroller">
+    <div class="table-container multi-table-container">
+      <table class="pure-table pure-table-striped">
         <tr>
-            <td>Block: {{blk_height}}</td>
-            <td>Timestamp [UCT]: {{blk_timestamp}}</td>
-            <td>Age [y:d:h:m:s]: {{delta_time}}</td>
-            <td>Fee: {{tx_fee}}</td>
-            <td>Tx size: {{tx_size}} kB</td>
+          <td>Sum from matched and marked by * ring member's outputs</td>
+          <td>{{sum_mixin_xmr}} Ryo</td>
         </tr>
-
-    </table>
-
-    {{^tx_prove}}
-        <h3>Checking which outputs belong to the given address and viewkey</h3>
-        <h5>address: {{xmr_address}}</h5>
-        <h5>viewkey: {{viewkey}}</h5>
-    {{/tx_prove}}
-    {{#tx_prove}}
-        <h3>Prove that you send this tx to the given address</h3>
-        <h5>address: {{xmr_address}}</h5>
-        <h5>Tx private key: {{viewkey}}</h5>
-    {{/tx_prove}}
-
-    <h3>Outputs ({{outputs_no}})</h3>
-    <div class="center">
-        <table class="center" >
-            <tr>
-                <td>output public key</td>
-                <td>amount</td>
-                <td>output match?</td>
-            </tr>
-            {{#outputs}}
-            <tr>
-                <td>{{output_idx}}: {{out_pub_key}}</td>
-                <td>{{amount}}</td>
-                {{#mine_output}}
-                <td>
-                        <span style="color: #008009;font-weight: bold">
-                        {{mine_output}}
-                        </span>
-                </td>
-                {{/mine_output}}
-                {{^mine_output}}
-                    <td>{{mine_output}}</td>
-                {{/mine_output}}
-            </tr>
-            {{/outputs}}
-        </table>
-
-        <h3>
-            Sum Ryo from matched outputs (i.e., incoming Ryo):
-            {{#found_our_outputs}}
-                {{sum_xmr}}
-            {{/found_our_outputs}}
-            {{^found_our_outputs}}
-                0.000000000000
-            {{/found_our_outputs}}
-        </h3>
-        <h4>
-            <a href="{{shortcut_url}}" target="_blank">link to this page</a>
-        </h4>
-
+        <tr>
+          <td>Possible spending is</td>
+          <td>{{possible_spending}} Ryo (tx fee included)</td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            Note: without private spendkey,
+            it is impossible to know whether this is your real spending.
+          </td>
+        </tr>
+      </table>
     </div>
-
-    {{#show_inputs}}
-    <br/>
-    <label id="show-decoded-inputs" for="toggle-1">Show decoded inputs</label>
-    <input type="checkbox" id="toggle-1">
-
-    <div id="decoded-inputs">
-    <h3>Inputs ({{inputs_no}})</h3>
-        <div class="center">
-            {{#inputs}}
-                <h4>Key image: {{key_image}}, amount {{key_image_amount}}</h4>
-                {{#mixins}}
-                    {{#has_mixin_outputs}}
-                        {{#mixin_outputs}}
-                        <div class="center">
-                            <table class="center">
-                              <tr>
-                                  <td style="text-align: center;">
-                                      Ring member {{mixin_pub_key}} might use your outputs
-                                      <br/>
-                                      from tx of hash: <a href="/tx/{{mix_tx_hash}}">{{mix_tx_hash}}</a>
-                                      <br/>(tx public key: {{mix_tx_pub_key}})
-                                  </td>
-                              </tr>
-                            {{#has_found_outputs}}
-                                <tr><td>
-                                    <div class="center">
-                                        <table class="center">
-                                            <tr>
-                                                <td>output public key</td>
-                                                <td>amount</td>
-                                                <td>output match?</td>
-                                            </tr>
-                                        {{#found_outputs}}
-                                                <tr>
-                                                    <td>{{my_public_key}}</td>
-                                                    <td>{{amount}}</td>
-                                                    <td>
-                                                        {{#mine_output}}
-                                                            <span style="color: #008009;font-weight: bold">{{mine_output}}</span>{{#out_in_match}}*{{/out_in_match}}
-                                                        {{/mine_output}}
-                                                        {{^mine_output}}
-                                                            {{mine_output}}
-                                                        {{/mine_output}}
-                                                    </td>
-                                                </tr>
-                                        {{/found_outputs}}
-                                        </table>
-                                    </div>
-                                </td></tr>
-                            {{/has_found_outputs}}
-                           </table>
-                        </div>
-                        {{/mixin_outputs}}
-                    {{/has_mixin_outputs}}
-                {{/mixins}}
-            {{/inputs}}
-
-        </div>
-        <h3>
-            Sum Ryo from matched and marked by * ring member's outputs: {{sum_mixin_xmr}}
-            <br/>
-            <span style="font-size: 16px"> Possible spending is:
-                {{possible_spending}} (tx fee included)
-            </span>
-                <br/>
-            <span style="font-size: 14px">Note: without private spendkey,
-                it is impossible to know whether this is your real spending. <br/>
-                So do not take this number seriously.
-                It is probably totally wrong anyway.</span>
-        </h3>
-    </div>
-
-    {{/show_inputs}}
-
+  </div>
+  {{/show_inputs}}
 
 </div>
-<br/>

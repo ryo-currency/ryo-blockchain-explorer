@@ -1,5 +1,5 @@
 
-<div class="center">
+<div>
 
   <div class="pure-g network-stats">
 
@@ -65,71 +65,73 @@
   
 </div>
 
-    {{{mempool_info}}}
+{{{mempool_info}}}
 
-    {{#is_page_zero}}
-      <h2 style="margin-bottom: 0px">Transactions in the last {{no_of_last_blocks}} blocks</h2>
-    {{/is_page_zero}}
-    {{^is_page_zero}}
-      <h2 style="margin-bottom: 0px">Transactions in older blocks<!--(height: {{height}})--></h2>
-    {{/is_page_zero}}
+<div class="table-header">
+  {{#is_page_zero}}
+  Transactions in the last {{no_of_last_blocks}} blocks
+  {{/is_page_zero}}
+  {{^is_page_zero}}
+  Transactions in older blocks<!--(height: {{height}})-->
+  {{/is_page_zero}}
+</div>
 
-    <p>(Median size of 100 blocks: {{blk_size_median}} kB)</p>
+<div class="table-scroller">
+  <div class="table-container">
 
-    <div>
-      <div class="table-scroller">
-	<div class="table-container">
-          <table class="pure-table pure-table-striped">
-	    <thead>
-            <tr>
-              <th style="width:50px;">height</th>
-              <th style="width:70px;">age {{age_format}}<!--(Δm)--></th>
-              <th style="width:50px;">size [kB]<!--(Δm)--></th>
-              <th>transaction hash</th>
-              <th style="width:50px;">fee</th>
-              <th style="width:60px;">outputs</th>
-              <th style="width:80px;">in/out/pID</th>
-              <th style="width:40px;">ring size</th>
-              <th style="width:70px;">tx size [kB]</th>
-            </tr>
-	    </thead>
-	    <tbody>
-            {{#txs}}
-            <tr>
-              <td><a href="/block/{{height}}">{{height}}</a></td>
-              <td>{{age}}<!--{{time_delta}}--></td>
-              <td>{{blk_size}}</td>
-              <td><a href="/tx/{{hash}}">{{hash}}</a></td>
-              <td>{{tx_fee_short}}</td>
-              <td>{{sum_outputs_short}}</td>
-              <td>{{no_inputs}}/{{no_outputs}}/{{pID}}</td>
-              <td>{{mixin}}</td>
-              <td>{{tx_size_short}}</td>
-            </tr>
-            {{/txs}}
-	    </tbody>
-          </table>
-	</div>
-      </div>
-      <div id="pages">
-        {{^is_page_zero}}
-        <a href="/page/{{prev_page}}">previous page</a> |
-        <a href="/">first page</a> |
-        {{/is_page_zero}}
-        current page: {{page_no}} / <a href="/page/{{total_page_no}}">{{total_page_no}}</a>
-        | <a href="/page/{{next_page}}">next page</a>
-      </div>
-
+    <div class="table-subheader">
+      (Median size of 100 blocks: {{blk_size_median}} kB)
     </div>
+    
+    <table class="pure-table pure-table-striped">
+      <thead>
+        <tr>
+          <th style="width:50px;">height</th>
+          <th style="width:70px;">age {{age_format}}<!--(Δm)--></th>
+          <th style="width:50px;">size [kB]<!--(Δm)--></th>
+          <th>transaction hash</th>
+          <th style="width:40px;">fee</th>
+          <th style="width:60px;">outputs</th>
+          <th style="width:80px;">in/out/pID</th>
+          <th style="width:40px;">ring size</th>
+          <th style="width:60px;">tx size [kB]</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#txs}}
+        <tr>
+          <td><a href="/block/{{height}}">{{height}}</a></td>
+          <td>{{age}}<!--{{time_delta}}--></td>
+          <td>{{blk_size}}</td>
+          <td><a href="/tx/{{hash}}">{{hash}}</a></td>
+          <td>{{tx_fee_short}}</td>
+          <td>{{sum_outputs_short}}</td>
+          <td>{{no_inputs}}/{{no_outputs}}/{{pID}}</td>
+          <td>{{mixin}}</td>
+          <td>{{tx_size_short}}</td>
+        </tr>
+        {{/txs}}
+      </tbody>
+    </table>
+  </div>
+</div>
 
+<div id="pages">
+  {{^is_page_zero}}
+  <a href="/page/{{prev_page}}">previous page</a> |
+  <a href="/">first page</a> |
+  {{/is_page_zero}}
+  current page: {{page_no}} / <a href="/page/{{total_page_no}}">{{total_page_no}}</a>
+  | <a href="/page/{{next_page}}">next page</a>
+</div>
 
 {{#show_cache_times}}
-    <div class="center">
-        <h6 style="margin-top: 1px;color:#949490">
-            Tx details construction time: {{construction_time_total}} s
-            <br/>
-            includes {{construction_time_cached}} s from block cache ({{cache_hits}} hits)
-            and {{construction_time_non_cached}} s from non cache ({{cache_misses}} misses)
-        </h6>
-    </div>
+<div>
+  <h6 style="margin-top: 1px;color:#949490">
+    Tx details construction time: {{construction_time_total}} s
+    <br/>
+    includes {{construction_time_cached}} s from block cache ({{cache_hits}} hits)
+    and {{construction_time_non_cached}} s from non cache ({{cache_misses}} misses)
+  </h6>
+</div>
 {{/show_cache_times}}

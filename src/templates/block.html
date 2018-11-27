@@ -1,49 +1,103 @@
-
 <div>
 
-  <div class="line-break">
-    <h4>Block hash (height): {{blk_hash}} ({{blk_height}})</h4>
-
+  <div class="buttons-container">
     {{#have_prev_hash}}
-    <h5>Previous block: <a href="/block/{{prev_hash}}">{{prev_hash}}</a></h5>
+    <a href="/block/{{prev_hash}}" class="pure-button pure-button-active" title="{{prev_hash}}">&larr; Previous block</a>
     {{/have_prev_hash}}
-
+    
     {{#have_next_hash}}
-    <h5>Next block: <a href="/block/{{next_hash}}">{{next_hash}}</a></h5>
+    <a href="/block/{{next_hash}}" class="pure-button pure-button-active" title="{{next_hash}}">Next block &rarr;</a>
     {{/have_next_hash}}
   </div>
-
+  
+  <div class="table-header">
+    Block #{{blk_height}}
+  </div>
+  
   <div class="table-scroller">
-    <div class="table-container">
 
-      <table class="pure-table pure-table-striped">
-	<thead>
-	  <tr>
-	    <th colspan="6">Block Information</th>
-	  </tr>
-	</thead>
-	<tbody>
-          <tr>
-            <td>Timestamp [UCT] (epoch):</td><td>{{blk_timestamp}} ({{blk_timestamp_epoch}})</td>
-            <td>Age {{age_format}}:</td><td>{{blk_age}}</td>
-            <td>Δ [h:m:s]:</td><td>{{delta_time}}</td>
-          </tr>
-          <tr>
-            <td>Major.minor version:</td><td>{{major_ver}}.{{minor_ver}}</td>
-            <td>Block reward:</td><td>{{blk_reward}}</td>
-            <td>Block size [kB]:</td><td>{{blk_size}}</td>
-          </tr>
-          <tr>
-            <td>nonce:</td><td>{{blk_nonce}}</td>
-            <td>Total fees:</td><td>{{sum_fees}}</td>
-            <td>No of txs:</td><td>{{no_txs}}</td>
-          </tr>
-	</tbody>
-      </table>
+    <div class="table-subheader">
+      Block Information
+    </div>
+
+    <div class="monospace pure-g">
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Hash</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5 line-break">
+        <span>{{blk_hash}}</span>
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Timestamp [UCT] (epoch)</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_timestamp}} ({{blk_timestamp_epoch}})</span>
+      </div>
+
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Age {{age_format}}</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_age}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Δ [h:m:s]</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{delta_time}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Major.minor version</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{major_ver}}.{{minor_ver}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Block reward</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_reward}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Block size [kB]</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_size}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Nonce</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{blk_nonce}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>Total fees</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{sum_fees}}</span>
+      </div>
+      
+      <div class="pure-u-1-4 pure-u-md-1-5">
+        <span>No of txs</span>
+      </div>
+      <div class="pure-u-3-4 pure-u-md-4-5">
+        <span>{{no_txs}}</span>
+      </div>
+      
     </div>
   </div>
 
-  <h3>Miner reward transaction</h3>
+  <div class="table-header">
+    Miner reward transaction
+  </div>
   <div class="table-scroller">
     <div class="table-container">
       <table class="pure-table pure-table-striped">
@@ -70,7 +124,9 @@
   </div>
 
 
-  <h3>Transactions ({{no_txs}})</h3>
+  <div class="table-header">
+    Transactions ({{no_txs}})
+  </div>
   {{#have_txs}}
   <div class="table-scroller">
     <div class="table-container">
@@ -102,6 +158,13 @@
       </table>
     </div>
   </div>
+  {{/have_txs}}
+  {{^have_txs}}
+  <div class="table-scroller">
+    <div class="monospace padding">
+      No transactions in this block
+    </div>  
+  </div>  
   {{/have_txs}}
 
 </div>
