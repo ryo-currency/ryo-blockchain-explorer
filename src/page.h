@@ -522,12 +522,12 @@ public:
 
         uint64_t local_copy_server_timestamp = server_timestamp;
 
-        // number of last blocks to show
-        uint64_t no_of_last_blocks {no_blocks_on_index + 1};
-
         // get the current blockchain height. Just to check
         uint64_t height = core_storage->get_current_blockchain_height();
         string height_human = fmt::format("{:n}", height);
+
+        // number of last blocks to show
+        uint64_t no_of_last_blocks = std::min(no_blocks_on_index + 1, height);
 
         // initalise page tempate map with basic info about blockchain
         mstch::map context {
