@@ -2077,6 +2077,12 @@ public:
         // parefct matches must be equal to number of inputs in a tx.
         uint64_t no_of_matched_mixins {0};
 
+        // Hold all possible mixins that we found. This is only used so that
+        // we get number of all possibilities, and their total ryo amount
+        // (useful for unit testing)
+        //                        public_key    , amount
+        std::vector<std::pair<crypto::public_key, uint64_t>> all_possible_mixins;
+
         for (const txin_to_key& in_key: input_key_imgs)
         {
 
@@ -2251,14 +2257,16 @@ public:
                 mstch::node& has_found_outputs
                         = boost::get<mstch::map>(mixin_outputs.back())["has_found_outputs"];
 
+                uint64_t ringct_amount {0};
+
                 // for each output in mixin tx, find the one from key_image
                 // and check if it's ours.
                 for (const auto& mix_out: output_pub_keys)
                 {
 
-                    txout_to_key txout_k      = std::get<0>(mix_out);
-                    uint64_t amount           = std::get<1>(mix_out);
-                    uint64_t output_idx_in_tx = std::get<2>(mix_out);
+                    txout_to_key const& txout_k = std::get<0>(mix_out);
+                    uint64_t amount             = std::get<1>(mix_out);
+                    uint64_t output_idx_in_tx   = std::get<2>(mix_out);
 
                     //cout << " - " << pod_to_hex(txout_k.key) << endl;
 
@@ -2366,6 +2374,7 @@ public:
                             // for regular/old txs there must be also a match
                             // in amounts, not only in output public keys
                             sum_mixin_xmr += amount;
+                            ringct_amount += amount;
                             no_of_matched_mixins++;
                         }
 
@@ -2401,6 +2410,11 @@ public:
 
                 has_mixin_outputs = found_something;
 
+                if (found_something)
+                    all_possible_mixins.push_back(
+                        {mixin_tx_pub_key,
+                                in_key.amount == 0 ? ringct_amount : in_key.amount});
+
                 ++count;
 
             } // for (const cryptonote::output_data_t& output_data: mixin_outputs)
@@ -2424,6 +2438,17 @@ public:
 
 
         uint64_t possible_spending  {0};
+
+        // useful for unit testing as it provides total ryo sum
+        // of possible mixins
+        uint64_t all_possible_mixins_amount1  {0};
+
+        for (auto& p: all_possible_mixins)
+            all_possible_mixins_amount1 += p.second;
+
+        context["no_all_possible_mixins"] = static_cast<uint64_t>(all_possible_mixins.size());
+        context["all_possible_mixins_amount"] = xmreg::xmr_amount_to_str(
+            all_possible_mixins_amount1, "{:0.9f}", false);
 
         // show spending only if sum of mixins is more than
         // what we get + fee, and number of perferctly matched
