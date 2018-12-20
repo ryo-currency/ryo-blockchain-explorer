@@ -211,7 +211,7 @@ get_key_images(const transaction& tx);
 
 
 bool
-get_payment_id(const vector<uint8_t>& extra,
+get_payment_id(const ::tools::wallet2::tx_construction_data& tx_cd,
                crypto::hash& payment_id,
                crypto::hash8& payment_id8);
 

@@ -47,6 +47,7 @@
 #define TMPL_ADDRESS                TMPL_DIR "/address.html"
 #define TMPL_MY_OUTPUTS             TMPL_DIR "/my_outputs.html"
 #define TMPL_SEARCH_RESULTS         TMPL_DIR "/search_results.html"
+#define TMPL_ERROR_PAGE             TMPL_DIR "/error_page.html"
 #define TMPL_API                    TMPL_DIR "/api.html"
 #define TMPL_MY_RAWTX               TMPL_DIR "/rawtx.html"
 #define TMPL_MY_CHECKRAWTX          TMPL_DIR "/checkrawtx.html"
@@ -73,11 +74,11 @@
     MAKE_ONIONEXPLORER_RPC_VERSION(ONIONEXPLORER_RPC_VERSION_MAJOR, ONIONEXPLORER_RPC_VERSION_MINOR)
 
 
-// basic info about tx to be stored in cashe.
+// basic info about tx to be stored in cache.
 // we need to store block_no and timestamp,
 // as this time and number of confirmation needs
-// to be updated between requests. Just cant
-// get it from cash, as it will be old very soon
+// to be updated between requests. Just can't
+// get it from cache, as it will be old very soon
 struct tx_info_cache
 {
     uint64_t   block_no;
@@ -413,6 +414,7 @@ public:
         template_file["checkoutputkeys"] = get_full_page(xmreg::read(TMPL_MY_CHECKRAWOUTPUTKEYS));
         template_file["address"]         = get_full_page(xmreg::read(TMPL_ADDRESS));
         template_file["search_results"]  = get_full_page(xmreg::read(TMPL_SEARCH_RESULTS));
+        template_file["error_page"]      = get_full_page(xmreg::read(TMPL_ERROR_PAGE));
         template_file["api"]             = get_full_page(xmreg::read(TMPL_API));
         template_file["tx_details"]      = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_details.html");
         template_file["tx_table_header"] = xmreg::read(string(TMPL_PARIALS_DIR) + "/tx_table_header.html");
@@ -581,7 +583,7 @@ public:
 
             if (!mcore->get_block_by_height(i, blk))
             {
-                cerr << "Cant get block: " << i << endl;
+                cerr << "Can't get block: " << i << endl;
                 --i;
                 continue;
             }
@@ -680,7 +682,7 @@ public:
                     if (!is_tx_still_in_block_as_expected)
                     {
                         // if some tx in cache is not in blockchain
-                        // where it should be, its probably better to
+                        // where it should be, it's probably better to
                         // ditch entire cache, as redo it below.
 
                         block_tx_cache.Clear();
@@ -728,7 +730,7 @@ public:
 
                 if (!core_storage->get_transactions(blk.tx_hashes, blk_txs, missed_txs))
                 {
-                    cerr << "Cant get transactions in block: " << i << endl;
+                    cerr << "Can't get transactions in block: " << i << endl;
                     --i;
                     continue;
                 }
@@ -833,9 +835,9 @@ public:
         pair<string, string> network_info_age = get_age(local_copy_server_timestamp,
                                                         current_network_info.info_timestamp);
 
-        // if network info is younger than 2 minute, assume its current. No sense
-        // showing that it is not current if its less then block time.
-        if (local_copy_server_timestamp - current_network_info.info_timestamp < 120)
+        // if network info is younger than 4 minute, assume it's current. No sense
+        // showing that it is not current if it's less then block time.
+        if (local_copy_server_timestamp - current_network_info.info_timestamp < 240)
         {
             current_network_info.current = true;
         }
@@ -862,7 +864,7 @@ public:
         // median size of 100 blocks
         context["blk_size_median"] = string {current_network_info.block_size_median_str};
 
-        string mempool_html {"Cant get mempool_pool"};
+        string mempool_html {"Can't get mempool_pool"};
 
         // get mempool data for the front page, if ready. If not, then just skip.
         std::future_status mempool_ftr_status = mempool_ftr.wait_for(
@@ -1128,19 +1130,18 @@ public:
 
         if (_blk_height > current_blockchain_height)
         {
-            cerr << "Cant get block: " << _blk_height
+            cerr << "Can't get block: " << _blk_height
                  << " since its higher than current blockchain height"
                  << " i.e., " <<  current_blockchain_height
                  << endl;
-            return fmt::format("Cant get block {:d} since its higher than current blockchain height!",
-                               _blk_height);
+            return show_error_page("Block Information", fmt::format("Can't get block {:d} since it's higher than current blockchain height!", _blk_height));
         }
 
 
         if (!mcore->get_block_by_height(_blk_height, blk))
         {
-            cerr << "Cant get block: " << _blk_height << endl;
-            return fmt::format("Cant get block {:d}!", _blk_height);
+            cerr << "Can't get block: " << _blk_height << endl;
+            return show_error_page("Block Information", fmt::format("Can't get block {:d}!", _blk_height));
         }
 
         // get block's hash
@@ -1253,7 +1254,7 @@ public:
 
             if (!mcore->get_tx(tx_hash, tx))
             {
-                cerr << "Cant get tx: " << tx_hash << endl;
+                cerr << "Can't get tx: " << tx_hash << endl;
                 continue;
             }
 
@@ -1297,8 +1298,8 @@ public:
 
         if (!xmreg::parse_str_secret_key(_blk_hash, blk_hash))
         {
-            cerr << "Cant parse blk hash: " << blk_hash << endl;
-            return fmt::format("Cant get block {:s} due to block hash parse error!", blk_hash);
+            cerr << "Can't parse blk hash: " << blk_hash << endl;
+            return show_error_page("Block Information", fmt::format("Can't get block {:s} due to block hash parse error!", blk_hash));
         }
 
         uint64_t blk_height;
@@ -1309,8 +1310,8 @@ public:
         }
         else
         {
-            cerr << "Cant get block: " << blk_hash << endl;
-            return fmt::format("Cant get block {:s}", blk_hash);
+            cerr << "Can't get block: " << blk_hash << endl;
+            return show_error_page("Block Information", fmt::format("Can't get block {:s}", blk_hash));
         }
 
         return show_block(blk_height);
@@ -1325,8 +1326,8 @@ public:
 
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
-            cerr << "Cant parse tx hash: " << tx_hash_str << endl;
-            return string("Cant get tx hash due to parse error: " + tx_hash_str);
+            cerr << "Can't parse tx hash: " << tx_hash_str << endl;
+            return show_error_page("Transaction details", "Can't get tx hash due to parse error: " + tx_hash_str);
         }
 
         // tx age
@@ -1341,7 +1342,7 @@ public:
 
         if (!mcore->get_tx(tx_hash, tx))
         {
-            cerr << "Cant get tx in blockchain: " << tx_hash
+            cerr << "Can't get tx in blockchain: " << tx_hash
                  << ". \n Check mempool now" << endl;
 
             vector<MempoolStatus::mempool_tx> found_txs;
@@ -1353,7 +1354,7 @@ public:
                 // there should be only one tx found
                 tx = found_txs.at(0).tx;
 
-                // since its tx in mempool, it has no blk yet
+                // since it is tx in mempool, it has no blk yet
                 // so use its recive_time as timestamp to show
 
                 uint64_t tx_recieve_timestamp
@@ -1371,7 +1372,7 @@ public:
             else
             {
                 // tx is nowhere to be found :-(
-                return string("Cant get tx: " + tx_hash_str);
+                return show_error_page("Transaction details", "Can't get tx: " + tx_hash_str);
             }
         }
 
@@ -1386,10 +1387,10 @@ public:
             // tx context from cashe. just for fun, to see if cache is any faster.
             auto start = std::chrono::steady_clock::now();
 
-            const tx_info_cache& tx_info_cashed
+            const tx_info_cache& tx_info_cached
                     = tx_context_cache.Get({tx_hash, static_cast<bool>(with_ring_signatures)});
 
-            tx_context = tx_info_cashed.tx_map;
+            tx_context = tx_info_cached.tx_map;
 
             //cout << "get tx from cash: " << tx_hash_str <<endl;
             //cout << " - tx_blk_height: " << boost::get<uint64_t>(tx_context["tx_blk_height"]) <<endl;
@@ -1403,7 +1404,7 @@ public:
             if (tx_blk_height > 0)
             {
                 // seems to be in blockchain. off course it could have been orphaned
-                // so double check if its for sure in blockchain
+                // so double check if it's for sure in blockchain
 
                 if (core_storage->have_tx(tx_hash))
                 {
@@ -1422,7 +1423,7 @@ public:
                     tx_context["confirmations"] = bc_height - (tx_blk_height - 1);
 
                     // marke it as from cashe. useful if we want to show
-                    // info about cashed/not cashed in frontend.
+                    // info about cached/not cached in frontend.
                     tx_context["from_cache"] = true;
 
                     auto duration = std::chrono::duration_cast<std::chrono::microseconds>
@@ -1433,12 +1434,12 @@ public:
 
                     // normally we should update this into in the cache.
                     // but since we make this check all the time,
-                    // we can skip updating cashed version
+                    // we can skip updating cached version
 
                 } // if (core_storage->have_tx(tx_hash))
                 else
                 {
-                    // its not in blockchain, but it was there when we cashed it.
+                    // it's not in blockchain, but it was there when we cached it.
                     // so we update it in cash, as it should be back in mempool
 
                     tx_context = construct_tx_context(tx, static_cast<bool>(with_ring_signatures));
@@ -1454,7 +1455,7 @@ public:
             } //  if (tx_blk_height > 0)
             else
             {
-                // the tx was cashed when in mempool.
+                // the tx was cached when in mempool.
                 // since then, it might have been included in some block.
                 // so we check it.
 
@@ -1477,7 +1478,7 @@ public:
                 else
                 {
                     // still seems to be in mempool only.
-                    // so just get its time duration, as its read only
+                    // so just get its time duration, as it's read only
                     // from cache
 
                     tx_context["from_cache"] = true;
@@ -1567,20 +1568,26 @@ public:
 
         if (tx_hash_str.empty())
         {
-            return string("tx hash not provided!");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "tx hash not provided!");
+            else
+                return show_error_page("Prove sending", "tx hash not provided!");
         }
 
         if (xmr_address_str.empty())
         {
-            return string("Ryo address not provided!");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Ryo address not provided!");
+            else
+                return show_error_page("Prove sending", "Ryo address not provided!");
         }
 
         if (viewkey_str.empty())
         {
             if (!tx_prove)
-                return string("Viewkey not provided!");
+                return show_error_page("Decode outputs", "Viewkey not provided!");
             else
-                return string("Tx private key not provided!");
+                return show_error_page("Prove sending", "Tx private key not provided!");
         }
 
         // parse tx hash string to hash object
@@ -1588,8 +1595,11 @@ public:
 
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
-            cerr << "Cant parse tx hash: " << tx_hash_str << endl;
-            return string("Cant get tx hash due to parse error: " + tx_hash_str);
+            cerr << "Can't parse tx hash: " << tx_hash_str << endl;
+            if (!tx_prove)
+                show_error_page("Decode outputs", "Can't get tx hash due to parse error: " + tx_hash_str);
+            else
+                show_error_page("Prove sending", "Can't get tx hash due to parse error: " + tx_hash_str);
         }
 
         // parse string representing given Ryo address
@@ -1597,8 +1607,11 @@ public:
 
         if (!xmreg::parse_str_address(xmr_address_str,  address_info, nettype))
         {
-            cerr << "Cant parse string address: " << xmr_address_str << endl;
-            return string("Cant parse Ryo address: " + xmr_address_str);
+            cerr << "Can't parse string address: " << xmr_address_str << endl;
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't parse Ryo address: " + xmr_address_str);
+            else
+                return show_error_page("Prove sending", "Can't parse Ryo address: " + xmr_address_str);
         }
 
         // parse string representing given private key
@@ -1608,8 +1621,11 @@ public:
 
         if (!xmreg::parse_str_secret_key(viewkey_str, multiple_tx_secret_keys))
         {
-            cerr << "Cant parse the private key: " << viewkey_str << endl;
-            return string("Cant parse private key: " + viewkey_str);
+            cerr << "Can't parse the private key: " << viewkey_str << endl;
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't parse private key: " + viewkey_str);
+            else
+                return show_error_page("Prove sending", "Can't parse private key: " + viewkey_str);
         }
         if (multiple_tx_secret_keys.size() == 1)
         {
@@ -1618,7 +1634,8 @@ public:
         else if (!tx_prove)
         {
             cerr << "Concatenated secret keys are only for tx proving!" << endl;
-            return string("Concatenated secret keys are only for tx proving!");
+
+            return show_error_page("Decode outputs", "Concatenated secret keys are only for tx proving!");
         }
 
 
@@ -1631,8 +1648,8 @@ public:
 //        crypto::secret_key prv_spend_key;
 //        if (!xmreg::parse_str_secret_key(spend_key_str, prv_spend_key))
 //        {
-//            cerr << "Cant parse the prv_spend_key : " << spend_key_str << endl;
-//            return string("Cant parse prv_spend_key : " + spend_key_str);
+//            cerr << "Can't parse the prv_spend_key : " << spend_key_str << endl;
+//            return show_error_page("My outputs", "Can't parse prv_spend_key : " + spend_key_str);
 //        }
 
         // tx age
@@ -1653,7 +1670,7 @@ public:
 
             if (!epee::string_tools::parse_hexstr_to_binbuff(raw_tx_data, tx_data_blob))
             {
-                string msg = fmt::format("Cant obtain tx_data_blob from raw_tx_data");
+                string msg = fmt::format("Can't obtain tx_data_blob from raw_tx_data");
 
                 cerr << msg << endl;
 
@@ -1668,7 +1685,7 @@ public:
                                                              tx_hash_from_blob,
                                                              tx_prefix_hash_from_blob))
             {
-                string msg = fmt::format("cant parse_and_validate_tx_from_blob");
+                string msg = fmt::format("can't parse_and_validate_tx_from_blob");
 
                 cerr << msg << endl;
 
@@ -1678,7 +1695,7 @@ public:
         }
         else if (!mcore->get_tx(tx_hash, tx))
         {
-            cerr << "Cant get tx in blockchain: " << tx_hash
+            cerr << "Can't get tx in blockchain: " << tx_hash
                  << ". \n Check mempool now" << endl;
 
             vector<MempoolStatus::mempool_tx> found_txs;
@@ -1690,7 +1707,7 @@ public:
                 // there should be only one tx found
                 tx = found_txs.at(0).tx;
 
-                // since its tx in mempool, it has no blk yet
+                // since it's tx in mempool, it has no blk yet
                 // so use its recive_time as timestamp to show
 
                 uint64_t tx_recieve_timestamp
@@ -1705,7 +1722,10 @@ public:
             else
             {
                 // tx is nowhere to be found :-(
-                return string("Cant get tx: " + tx_hash_str);
+                if (!tx_prove)
+                    return show_error_page("Decode outputs", "Can't get tx: " + tx_hash_str);
+                else
+                    return show_error_page("Prove sending", "Can't get tx: " + tx_hash_str);
             }
         }
 
@@ -1722,7 +1742,7 @@ public:
         }
         catch (exception& e)
         {
-            cerr << "Cant get block height: " << tx_hash
+            cerr << "Can't get block height: " << tx_hash
                  << e.what() << endl;
         }
 
@@ -1731,10 +1751,11 @@ public:
 
         if (tx_blk_found && !mcore->get_block_by_height(tx_blk_height, blk))
         {
-            cerr << "Cant get block: " << tx_blk_height << endl;
+            cerr << "Can't get block: " << tx_blk_height << endl;
         }
 
         string tx_blk_height_str {"N/A"};
+        bool is_mined = false;
 
         if (tx_blk_found)
         {
@@ -1744,11 +1765,18 @@ public:
             blk_timestamp = xmreg::timestamp_to_str_gm(blk.timestamp);
 
             tx_blk_height_str = std::to_string(tx_blk_height);
+
+            is_mined = true;
         }
 
         // payments id. both normal and encrypted (payment_id8)
-        string pid_str   = pod_to_hex(txd.payment_id);
-        string pid8_str  = pod_to_hex(txd.payment_id8);
+        crypto::hash payment_id   = null_hash;
+        crypto::hash8 payment_id8 = null_hash8;
+
+        get_payment_id(tx, payment_id, payment_id8);
+
+        string pid_str   = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id));
+        string pid8_str  = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id8));
 
         string shortcut_url = domain
                               + (tx_prove ? "/prove" : "/myoutputs")
@@ -1773,17 +1801,19 @@ public:
                 {"viewkey"              , viewkey_str_partial},
                 {"tx_pub_key"           , pod_to_hex(txd.pk)},
                 {"blk_height"           , tx_blk_height_str},
+                {"is_mined"             , is_mined},
                 {"tx_size"              , fmt::format("{:0.4f}",
                                                       static_cast<double>(txd.size) / 1024.0)},
-                {"tx_fee"               , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", true)},
+                {"tx_fee"               , xmreg::xmr_amount_to_str(txd.fee, "{:0.9f}", true)},
                 {"blk_timestamp"        , blk_timestamp},
                 {"delta_time"           , age.first},
                 {"outputs_no"           , static_cast<uint64_t>(txd.output_pub_keys.size())},
-                {"has_payment_id"       , txd.payment_id  != null_hash},
-                {"has_payment_id8"      , txd.payment_id8 != null_hash8},
+                {"has_payment_id"       , (payment_id  != null_hash)},
+                {"has_payment_id8"      , (payment_id8 != null_hash8)},
                 {"payment_id"           , pid_str},
                 {"payment_id8"          , pid8_str},
                 {"decrypted_payment_id8", string{}},
+                {"uniform_payment_id"   , string{}},
                 {"tx_prove"             , tx_prove},
                 {"shortcut_url"         , shortcut_url}
         };
@@ -1801,8 +1831,8 @@ public:
 
         if (tx_prove && multiple_tx_secret_keys.size() != txd.additional_pks.size() + 1)
         {
-            return string("This transaction includes additional tx pubkeys whose "
-                           "size doesn't match with the provided tx secret keys");
+            return show_error_page("Prove sending", string("This transaction includes additional tx") +
+                                   string("pubkeys whose size doesn't match with the provided tx secret keys"));
         }
 
         public_key pub_key = tx_prove ? address_info.address.m_view_public_key : txd.pk;
@@ -1813,11 +1843,14 @@ public:
                                      tx_prove ? multiple_tx_secret_keys[0] : prv_view_key,
                                      derivation))
         {
-            cerr << "Cant get derived key for: "  << "\n"
+            cerr << "Can't get derived key for: "  << "\n"
                  << "pub_tx_key: " << pub_key << " and "
                  << "prv_view_key" << prv_view_key << endl;
 
-            return string("Cant get key_derivation");
+            if (!tx_prove)
+                return show_error_page("Decode outputs", "Can't get key_derivation");
+            else
+                return show_error_page("Prove sending", "Can't get key_derivation");
         }
 
         for (size_t i = 0; i < txd.additional_pks.size(); ++i)
@@ -1826,11 +1859,14 @@ public:
                                          tx_prove ? multiple_tx_secret_keys[i + 1] : prv_view_key,
                                          additional_derivations[i]))
             {
-                cerr << "Cant get derived key for: "  << "\n"
+                cerr << "Can't get derived key for: "  << "\n"
                      << "pub_tx_key: " << txd.additional_pks[i] << " and "
                      << "prv_view_key" << prv_view_key << endl;
 
-                return string("Cant get key_derivation");
+                if (!tx_prove)
+                    return show_error_page("Decode outputs", "Can't get key_derivation");
+                else
+                    return show_error_page("Prove sending", "Can't get key_derivation");
             }
         }
 
@@ -1842,6 +1878,26 @@ public:
             if (mcore->get_device()->decrypt_payment_id(decrypted_payment_id8, pub_key, prv_view_key))
             {
                 context["decrypted_payment_id8"] = pod_to_hex(decrypted_payment_id8);
+            }
+        }
+
+        // decrypt uniform payment_id
+        if(payment_id == null_hash && payment_id8 == null_hash8)
+        {
+            std::vector<tx_extra_field> tx_extra_fields;
+            if(parse_tx_extra(tx.extra, tx_extra_fields))
+            {
+                tx_extra_uniform_payment_id uniform_pid;
+                if(get_payment_id_from_tx_extra(tx_extra_fields, uniform_pid))
+                {
+                    if (mcore->get_device()->decrypt_payment_id(uniform_pid.pid, pub_key, prv_view_key))
+                    {
+                        if(uniform_pid.pid.zero == 0)
+                        {
+                            context["uniform_payment_id"] = pod_to_hex(uniform_pid.pid.payment_id);
+                        }
+                    }
+                }
             }
         }
 
@@ -1909,7 +1965,7 @@ public:
 
                     if (!r)
                     {
-                        cerr << "\nshow_my_outputs: Cant decode ringCT! " << endl;
+                        cerr << "\nshow_my_outputs: Can't decode ringCT! " << endl;
                     }
 
                     outp.second         = rct_amount;
@@ -1930,7 +1986,7 @@ public:
 
         // we can also test ouputs used in mixins for key images
         // this can show possible spending. Only possible, because
-        // without a spend key, we cant know for sure. It might be
+        // without a spend key, we can't know for sure. It might be
         // that our output was used by someone else for their mixins.
 
         bool show_key_images {false};
@@ -2005,11 +2061,11 @@ public:
             // testnet tx 430b070e213659a864ec82d674fddb5ccf7073cae231b019ba1ebb4bfdc07a15
             // and testnet wallet details provided earier for spend key,
             // demonstrate this. this txs has one input that uses two of our ouputs.
-            // without spent key, its imposible to know which one is real spendking
+            // without spent key, it's imposible to know which one is real spendking
             // and which one is fake.
             size_t no_of_output_matches_found {0};
 
-            // for each found output public key check if its ours or not
+            // for each found output public key check if it's ours or not
             for (const uint64_t& abs_offset: absolute_offsets)
             {
 
@@ -2048,7 +2104,7 @@ public:
 
                 if (!mcore->get_tx(tx_out_idx.first, mixin_tx))
                 {
-                    cerr << "Cant get tx: " << tx_out_idx.first << endl;
+                    cerr << "Can't get tx: " << tx_out_idx.first << endl;
 
                     break;
                 }
@@ -2085,7 +2141,7 @@ public:
 
                 if (!generate_key_derivation(mixin_tx_pub_key, prv_view_key, derivation))
                 {
-                    cerr << "Cant get derived key for: "  << "\n"
+                    cerr << "Can't get derived key for: "  << "\n"
                          << "pub_tx_key: " << mixin_tx_pub_key << " and "
                          << "prv_view_key" << prv_view_key << endl;
 
@@ -2095,7 +2151,7 @@ public:
                 {
                     if (!generate_key_derivation(mixin_additional_tx_pub_keys[i], prv_view_key, additional_derivations[i]))
                     {
-                        cerr << "Cant get derived key for: "  << "\n"
+                        cerr << "Can't get derived key for: "  << "\n"
                              << "pub_tx_key: " << mixin_additional_tx_pub_keys[i] << " and "
                              << "prv_view_key" << prv_view_key << endl;
 
@@ -2123,7 +2179,7 @@ public:
                         = boost::get<mstch::map>(mixin_outputs.back())["has_found_outputs"];
 
                 // for each output in mixin tx, find the one from key_image
-                // and check if its ours.
+                // and check if it's ours.
                 for (const auto& mix_out: output_pub_keys)
                 {
 
@@ -2183,7 +2239,7 @@ public:
 
                             if (!r)
                             {
-                                cerr << "show_my_outputs: key images: Cant decode ringCT!" << endl;
+                                cerr << "show_my_outputs: key images: Can't decode ringCT!" << endl;
                             }
 
                             amount = rct_amount;
@@ -2232,7 +2288,7 @@ public:
                         {
                             // for regular txs, just concentrated on outputs
                             // which have same amount as the key image.
-                            // for ringct its not possible to know for sure amount
+                            // for ringct it's not possible to know for sure amount
                             // in key image without spend key, so we just use all
                             // for regular/old txs there must be also a match
                             // in amounts, not only in output public keys
@@ -2250,7 +2306,7 @@ public:
 //                                                       prv_spend_key,
 //                                                       address.m_spend_public_key,
 //                                                       key_img)) {
-//                            cerr << "Cant generate key image for output: "
+//                            cerr << "Can't generate key image for output: "
 //                                 << pod_to_hex(output_data.pubkey) << endl;
 //                            break;
 //                        }
@@ -2291,7 +2347,7 @@ public:
         context["show_inputs"]   = show_key_images;
         context["inputs_no"]     = static_cast<uint64_t>(inputs.size());
         context["sum_mixin_xmr"] = xmreg::xmr_amount_to_str(
-                sum_mixin_xmr, "{:0.12f}", false);
+                sum_mixin_xmr, "{:0.9f}", false);
 
 
         uint64_t possible_spending  {0};
@@ -2307,7 +2363,7 @@ public:
         }
 
         context["possible_spending"] = xmreg::xmr_amount_to_str(
-                possible_spending, "{:0.12f}", false);
+                possible_spending, "{:0.9f}", false);
 
         add_css_style(context);
 
@@ -2345,7 +2401,7 @@ public:
     }
 
     string
-    show_checkrawtx(string raw_tx_data, string action)
+    show_checkrawtx(string raw_tx_data, string viewkey_str)
     {
         clean_post_data(raw_tx_data);
 
@@ -2389,7 +2445,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate unsigned tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::unsigned_tx_set exported_txs;
 
@@ -2419,7 +2500,7 @@ public:
                     crypto::hash payment_id   = null_hash;
                     crypto::hash8 payment_id8 = null_hash8;
 
-                    get_payment_id(tx_cd.extra, payment_id, payment_id8);
+                    get_payment_id(tx_cd, payment_id, payment_id8);
 
                     // payments id. both normal and encrypted (payment_id8)
                     string pid_str   = REMOVE_HASH_BRAKETS(fmt::format("{:s}", payment_id));
@@ -2428,7 +2509,7 @@ public:
 
                     mstch::map tx_cd_data {
                             {"no_of_sources"      , static_cast<uint64_t>(no_of_sources)},
-                            {"use_rct"            , tx_cd.use_rct},
+                            {"use_rct"            , true},
                             {"change_amount"      , xmreg::xmr_amount_to_str(tx_change.amount)},
                             {"has_payment_id"     , (payment_id  != null_hash)},
                             {"has_payment_id8"    , (payment_id8 != null_hash8)},
@@ -2499,7 +2580,7 @@ public:
 
                             cerr << out_msg << endl;
 
-                            return string(out_msg);
+                            return show_error_page("Transaction Pusher", out_msg);
                         }
 
 
@@ -2508,8 +2589,8 @@ public:
 
                         if (!mcore->get_tx(real_toi.first, real_source_tx))
                         {
-                            cerr << "Cant get tx in blockchain: " << real_toi.first << endl;
-                            return string("Cant get tx: " + pod_to_hex(real_toi.first));
+                            cerr << "Can't get tx in blockchain: " << real_toi.first << endl;
+                            return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                         }
 
                         tx_details real_txd = get_tx_details(real_source_tx);
@@ -2550,17 +2631,17 @@ public:
 
                                 cerr << out_msg << endl;
 
-                                return string(out_msg);
+                                return show_error_page("Transaction Pusher", out_msg);
                             }
 
                             transaction tx;
 
                             if (!mcore->get_tx(toi.first, tx))
                             {
-                                cerr << "Cant get tx in blockchain: " << toi.first
+                                cerr << "Can't get tx in blockchain: " << toi.first
                                      << ". \n Check mempool now" << endl;
                                 // tx is nowhere to be found :-(
-                                return string("Cant get tx: " + pod_to_hex(toi.first));
+                                return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                             }
 
                             tx_details txd = get_tx_details(tx);
@@ -2573,8 +2654,8 @@ public:
 
                             if (!mcore->get_block_by_height(txd.blk_height, blk))
                             {
-                                cerr << "Cant get block: " << txd.blk_height << endl;
-                                return string("Cant get block: "  + to_string(txd.blk_height));
+                                cerr << "Can't get block: " << txd.blk_height << endl;
+                                return show_error_page("Transaction Pusher", "Can't get block: " + to_string(txd.blk_height));
                             }
 
                             pair<string, string> age = get_age(server_timestamp, blk.timestamp);
@@ -2635,8 +2716,13 @@ public:
             else
             {
                 cerr << "deserialization of unsigned tx data NOT successful" << endl;
-                return string("deserialization of unsigned tx data NOT successful. "
-                                      "Maybe its not base64 encoded?");
+                string error_msg = fmt::format("Deserialization of unsigned tx data NOT successful. "
+                                               "Maybe it's not base64 encoded?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
             }
         } // if (unsigned_tx_given)
         else
@@ -2650,7 +2736,7 @@ public:
             if (strncmp(decoded_raw_tx_data.c_str(), SIGNED_TX_PREFIX, magiclen) != 0)
             {
 
-                // ok, so its not signed tx data. but maybe it is raw tx data
+                // ok, so it's not signed tx data. but maybe it is raw tx data
                 // used in rpc call "/sendrawtransaction". This is for example
                 // used in mymonero and openmonero projects.
 
@@ -2666,13 +2752,15 @@ public:
 
                 if (!epee::string_tools::parse_hexstr_to_binbuff(raw_tx_data, tx_data_blob))
                 {
-                    string msg = fmt::format("The data is neither unsigned, signed tx or raw tx! "
-                                                     "Its prefix is: {:s}",
-                                             data_prefix);
+                    string error_msg = fmt::format("The data is neither unsigned, signed tx or raw tx! "
+                                                   "It's prefix is: {:s}", data_prefix);
 
-                    cout << msg << endl;
+                    cout << error_msg << endl;
 
-                    return string(msg);
+                    context["has_error"] = true;
+                    context["error_msg"] = error_msg;
+
+                    return mstch::render(full_page, context);
                 }
 
                 crypto::hash tx_hash_from_blob;
@@ -2736,7 +2824,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate signed tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::signed_tx_set signed_txs;
 
@@ -2756,8 +2869,13 @@ public:
             if (!r)
             {
                 cerr << "deserialization of signed tx data NOT successful" << endl;
-                return string("deserialization of signed tx data NOT successful. "
-                                      "Maybe its not base64 encoded?");
+                string error_msg = fmt::format("Deserialization of signed tx data NOT successful. "
+                                               "Maybe it's not base64 encoded?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
             }
 
             std::vector<tools::wallet2::pending_tx> ptxs = signed_txs.ptx;
@@ -2824,7 +2942,7 @@ public:
                 mstch::array& outputs = boost::get<mstch::array>(tx_context["outputs"]);
 
                 // show real output amount for ringct outputs.
-                // otherwise its only 0.000000000
+                // otherwise it's only 0.000000000
                 for (size_t i = 0; i < outputs.size(); ++i)
                 {
                     mstch::map& output_map = boost::get<mstch::map>(outputs.at(i));
@@ -2878,13 +2996,13 @@ public:
 
                         cerr << out_msg << endl;
 
-                        return string(out_msg);
+                        return show_error_page("Transaction Pusher", out_msg);
                     }
 
                     if (!mcore->get_tx(real_toi.first, real_source_tx))
                     {
-                        cerr << "Cant get tx in blockchain: " << real_toi.first << endl;
-                        return string("Cant get tx: " + pod_to_hex(real_toi.first));
+                        cerr << "Can't get tx in blockchain: " << real_toi.first << endl;
+                        return show_error_page("Transaction Pusher", "Can't get tx: " + pod_to_hex(real_toi.first));
                     }
 
                     tx_details real_txd = get_tx_details(real_source_tx);
@@ -2983,7 +3101,7 @@ public:
     }
 
     string
-    show_pushrawtx(string raw_tx_data, string action)
+    show_pushrawtx(string raw_tx_data, string viewkey_str)
     {
         clean_post_data(raw_tx_data);
 
@@ -3048,7 +3166,32 @@ public:
 
             bool r {false};
 
+            secret_key prv_view_key;
+
+            if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
+            {
+                string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
+
             string s = decoded_raw_tx_data.substr(magiclen);
+
+            s = xmreg::decrypt(s, prv_view_key, true);
+
+            if (s.empty())
+            {
+                string error_msg = fmt::format("Failed to authenticate signed tx data. "
+                                               "Maybe wrong viewkey was provided?");
+
+                context["has_error"] = true;
+                context["error_msg"] = error_msg;
+
+                return mstch::render(full_page, context);
+            }
 
             ::tools::wallet2::signed_tx_set signed_txs;
 
@@ -3069,7 +3212,7 @@ public:
             if (!r)
             {
                 string error_msg = fmt::format("Deserialization of signed tx data NOT successful! "
-                                                       "Maybe its not base64 encoded?");
+                                                       "Maybe it's not base64 encoded?");
 
                 context["has_error"] = true;
                 context["error_msg"] = error_msg;
@@ -3142,7 +3285,7 @@ public:
                 for (key_image& k_img: key_images_spent)
                 {
                     error_msg += REMOVE_HASH_BRAKETS(fmt::format("{:s}", k_img));
-                    error_msg += "</br>";
+                    error_msg += "<br/>";
                 }
 
                 context["has_error"] = true;
@@ -3245,7 +3388,7 @@ public:
 
         if (viewkey_str.empty())
         {
-            string error_msg = fmt::format("View key not given. Cant decode "
+            string error_msg = fmt::format("View key not given. Can't decode "
                                                    "the key image data without it!");
 
             context["has_error"] = true;
@@ -3256,7 +3399,7 @@ public:
 
         if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
         {
-            string error_msg = fmt::format("Cant parse the private key: " + viewkey_str);
+            string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
 
             context["has_error"] = true;
             context["error_msg"] = error_msg;
@@ -3288,7 +3431,7 @@ public:
         if (decoded_raw_data.empty())
         {
             string error_msg = fmt::format("Failed to authenticate key images data. "
-                                                   "Maybe wrong viewkey was porvided?");
+                                                   "Maybe wrong viewkey was provided?");
 
             context["has_error"] = true;
             context["error_msg"] = error_msg;
@@ -3391,7 +3534,7 @@ public:
 
         if (viewkey_str.empty())
         {
-            string error_msg = fmt::format("View key not given. Cant decode "
+            string error_msg = fmt::format("View key not given. Can't decode "
                                                    "the outputs data without it!");
 
             context["has_error"] = true;
@@ -3402,7 +3545,7 @@ public:
 
         if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
         {
-            string error_msg = fmt::format("Cant parse the private key: " + viewkey_str);
+            string error_msg = fmt::format("Can't parse the private key: " + viewkey_str);
 
             context["has_error"] = true;
             context["error_msg"] = error_msg;
@@ -3436,7 +3579,7 @@ public:
         if (decoded_raw_data.empty())
         {
             string error_msg = fmt::format("Failed to authenticate outputs data. "
-                                                   "Maybe wrong viewkey was porvided?");
+                                                   "Maybe wrong viewkey was provided?");
 
             context["has_error"] = true;
             context["error_msg"] = error_msg;
@@ -3513,7 +3656,7 @@ public:
 
                 if (!mcore->get_tx(td.m_txid, tx))
                 {
-                    string error_msg = fmt::format("Cant get tx of hash: {:s}", td.m_txid);
+                    string error_msg = fmt::format("Can't get tx of hash: {:s}", td.m_txid);
 
                     context["has_error"] = true;
                     context["error_msg"] = error_msg;
@@ -3545,7 +3688,7 @@ public:
                     if (!r)
                     {
                         string error_msg = fmt::format(
-                                "Cant decode RingCT for output: {:s}",
+                                "Can't decode RingCT for output: {:s}",
                                 txout_key.key);
 
                         context["has_error"] = true;
@@ -3621,9 +3764,9 @@ public:
         // first let try searching for tx
         result_html = show_tx(search_text);
 
-        // nasty check if output is "Cant get" as a sign of
+        // nasty check if output is "Can't get" as a sign of
         // a not found tx. Later need to think of something better.
-        if (result_html.find("Cant get") == string::npos)
+        if (result_html.find("Can't get") == string::npos)
         {
             return result_html;
         }
@@ -3640,9 +3783,9 @@ public:
 
                 result_html = show_block(blk_height);
 
-                // nasty check if output is "Cant get" as a sign of
+                // nasty check if output is "Can't get" as a sign of
                 // a not found tx. Later need to think of something better.
-                if (result_html.find("Cant get") == string::npos)
+                if (result_html.find("Can't get") == string::npos)
                 {
                     return result_html;
                 }
@@ -3658,7 +3801,7 @@ public:
         // for a block with given hash
         result_html = show_block(search_text);
 
-        if (result_html.find("Cant get") == string::npos)
+        if (result_html.find("Can't get") == string::npos)
         {
             return result_html;
         }
@@ -3666,25 +3809,63 @@ public:
         result_html = default_txt;
 
 
-        // check if monero address is given based on its length
+        // check if ryo address is given based on its length
         // if yes, then we can only show its public components
-        if (search_str_length == 95)
+        if (search_str_length == 99)
         {
-            // parse string representing given monero address
+            // parse string representing given ryo address
             address_parse_info address_info;
 
             cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
 
-            if (search_text[0] == '9' || search_text[0] == 'A' || search_text[0] == 'B')
+            if(search_text.substr(0,4) == "Suto" ||
+               search_text.substr(0,4) == "Susu" ||
+               search_text.substr(0,4) == "RYoT" ||
+               search_text.substr(0,4) == "RYoU")
+            {
                 nettype_addr = cryptonote::network_type::TESTNET;
-            if (search_text[0] == '5' || search_text[0] == '7')
+            }
+
+            if(search_text.substr(0,5) == "RYosT" ||
+               search_text.substr(0,5) == "RYosU")
+            {
                 nettype_addr = cryptonote::network_type::STAGENET;
+            }
 
             if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
             {
-                cerr << "Cant parse string address: " << search_text << endl;
-                return string("Cant parse address (probably incorrect format): ")
-                       + search_text;
+                cerr << "Can't parse string address: " << search_text << endl;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
+            }
+
+            return show_address_details(address_info, nettype_addr);
+        }
+
+        // check if kurz ryo address is given based on its length
+        // if yes, then show its public components
+        if (search_str_length == 55)
+        {
+            // parse string representing given ryo address
+            address_parse_info address_info;
+
+            cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
+
+            if(search_text.substr(0,4) == "RYoG" ||
+               search_text.substr(0,4) == "RYoH")
+            {
+                nettype_addr = cryptonote::network_type::TESTNET;
+            }
+
+            if(search_text.substr(0,5) == "RYosG" ||
+               search_text.substr(0,5) == "RYosK")
+            {
+                nettype_addr = cryptonote::network_type::STAGENET;
+            }
+
+            if (!xmreg::parse_str_address(search_text, address_info, nettype_addr))
+            {
+                cerr << "Can't parse string address: " << search_text << endl;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
             }
 
             return show_address_details(address_info, nettype_addr);
@@ -3692,23 +3873,35 @@ public:
 
         // check if integrated monero address is given based on its length
         // if yes, then show its public components search tx based on encrypted id
-        if (search_str_length == 106)
+        if (search_str_length == 110)
         {
 
             cryptonote::account_public_address address;
 
             address_parse_info address_info;
 
-            if (!get_account_address_from_str(nettype, address_info, search_text))
+            cryptonote::network_type nettype_addr {cryptonote::network_type::MAINNET};
+
+            if(search_text.substr(0,4) == "Suti" ||
+               search_text.substr(0,4) == "RYoE")
             {
-                cerr << "Cant parse string integerated address: " << search_text << endl;
-                return string("Cant parse address (probably incorrect format): ")
-                       + search_text;
+                nettype_addr = cryptonote::network_type::TESTNET;
+            }
+
+            if(search_text.substr(0,5) == "RYosE")
+            {
+                nettype_addr = cryptonote::network_type::STAGENET;
+            }
+
+            if (!get_account_address_from_str(nettype_addr, address_info, search_text))
+            {
+                cerr << "Can't parse string integrated address: " << search_text << endl;
+                return show_error_page("Address Details","Can't parse address (probably incorrect format): " + search_text);
             }
 
             return show_integrated_address_details(address_info,
                                                    address_info.payment_id,
-                                                   nettype);
+                                                   nettype_addr);
         }
 
         // all_possible_tx_hashes was field using custom lmdb database
@@ -3733,9 +3926,10 @@ public:
                 {"xmr_address"        , REMOVE_HASH_BRAKETS(address_str)},
                 {"public_viewkey"     , REMOVE_HASH_BRAKETS(pub_viewkey_str)},
                 {"public_spendkey"    , REMOVE_HASH_BRAKETS(pub_spendkey_str)},
+                {"is_kurz_addr"       , pub_viewkey_str == pub_spendkey_str},
                 {"is_integrated_addr" , false},
-                {"testnet"            , testnet},
-                {"stagenet"           , stagenet},
+                {"testnet"            , nettype == cryptonote::network_type::TESTNET},
+                {"stagenet"           , nettype == cryptonote::network_type::STAGENET},
         };
 
         add_css_style(context);
@@ -3761,9 +3955,10 @@ public:
                 {"public_viewkey"       , REMOVE_HASH_BRAKETS(pub_viewkey_str)},
                 {"public_spendkey"      , REMOVE_HASH_BRAKETS(pub_spendkey_str)},
                 {"encrypted_payment_id" , REMOVE_HASH_BRAKETS(enc_payment_id_str)},
+                {"is_kurz_addr"         , false},
                 {"is_integrated_addr"   , true},
-                {"testnet"              , testnet},
-                {"stagenet"             , stagenet},
+                {"testnet"              , nettype == cryptonote::network_type::TESTNET},
+                {"stagenet"             , nettype == cryptonote::network_type::STAGENET},
         };
 
         add_css_style(context);
@@ -3919,7 +4114,7 @@ public:
                         }
                         else
                         {
-                            return string("Cant get tx of hash (show_search_results): " + tx_hash);
+                            return show_error_page("Search", "Can't get tx of hash (show_search_results): " + tx_hash);
                         }
 
                         // tx in mempool have no blk_timestamp
@@ -3969,6 +4164,24 @@ public:
     }
 
     string
+    show_error_page(const string title, const string message)
+    {
+
+        // initalise page tempate map with basic info about blockchain
+        mstch::map context {
+            {"error_title" , title},
+            {"error_msg"   , message}
+        };
+
+        add_css_style(context);
+
+        string full_page = template_file["error_page"];
+
+        // render the page
+        return  mstch::render(full_page, context);
+    }
+
+    string
     get_js_file(string const& fname)
     {
         if (template_file.count(fname))
@@ -3997,7 +4210,7 @@ public:
 
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
-            j_data["title"] = fmt::format("Cant parse tx hash: {:s}", tx_hash_str);
+            j_data["title"] = fmt::format("Can't parse tx hash: {:s}", tx_hash_str);
             return j_response;
         }
 
@@ -4013,7 +4226,7 @@ public:
 
         if (!find_tx(tx_hash, tx, found_in_mempool, tx_timestamp))
         {
-            j_data["title"] = fmt::format("Cant find tx hash: {:s}", tx_hash_str);
+            j_data["title"] = fmt::format("Can't find tx hash: {:s}", tx_hash_str);
             return j_response;
         }
 
@@ -4033,7 +4246,7 @@ public:
 
                 if (!mcore->get_block_by_height(block_height, blk))
                 {
-                    j_data["title"] = fmt::format("Cant get block: {:d}", block_height);
+                    j_data["title"] = fmt::format("Can't get block: {:d}", block_height);
                     return j_response;
                 }
 
@@ -4163,7 +4376,7 @@ public:
 
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
-            j_data["title"] = fmt::format("Cant parse tx hash: {:s}", tx_hash_str);
+            j_data["title"] = fmt::format("Can't parse tx hash: {:s}", tx_hash_str);
             return j_response;
         }
 
@@ -4179,7 +4392,7 @@ public:
 
         if (!find_tx(tx_hash, tx, found_in_mempool, tx_timestamp))
         {
-            j_data["title"] = fmt::format("Cant find tx hash: {:s}", tx_hash_str);
+            j_data["title"] = fmt::format("Can't find tx hash: {:s}", tx_hash_str);
             return j_response;
         }
 
@@ -4195,7 +4408,7 @@ public:
 
                 if (!mcore->get_block_by_height(block_height, blk))
                 {
-                    j_data["title"] = fmt::format("Cant get block: {:d}", block_height);
+                    j_data["title"] = fmt::format("Can't get block: {:d}", block_height);
                     return j_response;
                 }
             }
@@ -4260,7 +4473,7 @@ public:
             catch (const boost::bad_lexical_cast& e)
             {
                 j_data["title"] = fmt::format(
-                        "Cant parse block number: {:s}", block_no_or_hash);
+                        "Can't parse block number: {:s}", block_no_or_hash);
                 return j_response;
             }
 
@@ -4274,7 +4487,7 @@ public:
 
             if (!mcore->get_block_by_height(block_height, blk))
             {
-                j_data["title"] = fmt::format("Cant get block: {:d}", block_height);
+                j_data["title"] = fmt::format("Can't get block: {:d}", block_height);
                 return j_response;
             }
 
@@ -4286,13 +4499,13 @@ public:
             // this seems to be block hash
             if (!xmreg::parse_str_secret_key(block_no_or_hash, blk_hash))
             {
-                j_data["title"] = fmt::format("Cant parse blk hash: {:s}", block_no_or_hash);
+                j_data["title"] = fmt::format("Can't parse blk hash: {:s}", block_no_or_hash);
                 return j_response;
             }
 
             if (!core_storage->get_block_by_hash(blk_hash, blk))
             {
-                j_data["title"] = fmt::format("Cant get block: {:s}", blk_hash);
+                j_data["title"] = fmt::format("Can't get block: {:s}", blk_hash);
                 return j_response;
             }
 
@@ -4300,7 +4513,7 @@ public:
         }
         else
         {
-            j_data["title"] = fmt::format("Cant find blk using search string: {:s}", block_no_or_hash);
+            j_data["title"] = fmt::format("Can't find blk using search string: {:s}", block_no_or_hash);
             return j_response;
         }
 
@@ -4338,7 +4551,7 @@ public:
             {
                 j_response["status"]  = "error";
                 j_response["message"]
-                        = fmt::format("Cant get transactions in block: {:d}", block_height);
+                        = fmt::format("Can't get transactions in block: {:d}", block_height);
                 return j_response;
             }
 
@@ -4403,7 +4616,7 @@ public:
             catch (const boost::bad_lexical_cast& e)
             {
                 j_data["title"] = fmt::format(
-                        "Cant parse block number: {:s}", block_no_or_hash);
+                        "Can't parse block number: {:s}", block_no_or_hash);
                 return j_response;
             }
 
@@ -4417,7 +4630,7 @@ public:
 
             if (!mcore->get_block_by_height(block_height, blk))
             {
-                j_data["title"] = fmt::format("Cant get block: {:d}", block_height);
+                j_data["title"] = fmt::format("Can't get block: {:d}", block_height);
                 return j_response;
             }
 
@@ -4429,13 +4642,13 @@ public:
             // this seems to be block hash
             if (!xmreg::parse_str_secret_key(block_no_or_hash, blk_hash))
             {
-                j_data["title"] = fmt::format("Cant parse blk hash: {:s}", block_no_or_hash);
+                j_data["title"] = fmt::format("Can't parse blk hash: {:s}", block_no_or_hash);
                 return j_response;
             }
 
             if (!core_storage->get_block_by_hash(blk_hash, blk))
             {
-                j_data["title"] = fmt::format("Cant get block: {:s}", blk_hash);
+                j_data["title"] = fmt::format("Can't get block: {:s}", blk_hash);
                 return j_response;
             }
 
@@ -4443,7 +4656,7 @@ public:
         }
         else
         {
-            j_data["title"] = fmt::format("Cant find blk using search string: {:s}", block_no_or_hash);
+            j_data["title"] = fmt::format("Can't find blk using search string: {:s}", block_no_or_hash);
             return j_response;
         }
 
@@ -4493,7 +4706,7 @@ public:
         catch (const boost::bad_lexical_cast& e)
         {
             j_data["title"] = fmt::format(
-                    "Cant parse page and/or limit numbers: {:s}, {:s}", _page, _limit);
+                    "Can't parse page and/or limit numbers: {:s}, {:s}", _page, _limit);
             return j_response;
         }
 
@@ -4530,7 +4743,7 @@ public:
             if (!mcore->get_block_by_height(i, blk))
             {
                 j_response["status"]  = "error";
-                j_response["message"] = fmt::format("Cant get block: {:d}", i);
+                j_response["message"] = fmt::format("Can't get block: {:d}", i);
                 return j_response;
             }
 
@@ -4560,7 +4773,7 @@ public:
             if (!core_storage->get_transactions(blk.tx_hashes, blk_txs, missed_txs))
             {
                 j_response["status"]  = "error";
-                j_response["message"] = fmt::format("Cant get transactions in block: {:d}", i);
+                j_response["message"] = fmt::format("Can't get transactions in block: {:d}", i);
                 return j_response;
             }
 
@@ -4617,7 +4830,7 @@ public:
         catch (const boost::bad_lexical_cast& e)
         {
             j_data["title"] = fmt::format(
-                    "Cant parse page and/or limit numbers: {:s}, {:s}", _page, _limit);
+                    "Can't parse page and/or limit numbers: {:s}, {:s}", _page, _limit);
             return j_response;
         }
 
@@ -4818,7 +5031,7 @@ public:
         if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse tx hash: " + tx_hash_str;
+            j_response["message"] = "Can't parse tx hash: " + tx_hash_str;
             return j_response;
         }
 
@@ -4828,7 +5041,7 @@ public:
         if (!xmreg::parse_str_address(address_str,  address_info, nettype))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse Ryo address: " + address_str;
+            j_response["message"] = "Can't parse Ryo address: " + address_str;
             return j_response;
 
         }
@@ -4839,7 +5052,7 @@ public:
         if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse view key or tx private key: "
+            j_response["message"] = "Can't parse view key or tx private key: "
                                     + viewkey_str;
             return j_response;
         }
@@ -4856,7 +5069,7 @@ public:
 
         if (!find_tx(tx_hash, tx, found_in_mempool, tx_timestamp))
         {
-            j_data["title"] = fmt::format("Cant find tx hash: {:s}", tx_hash_str);
+            j_data["title"] = fmt::format("Can't find tx hash: {:s}", tx_hash_str);
             return j_response;
         }
 
@@ -4877,7 +5090,7 @@ public:
         if (!generate_key_derivation(pub_key, prv_view_key, derivation))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant calculate key_derivation";
+            j_response["message"] = "Can't calculate key_derivation";
             return j_response;
         }
         for (size_t i = 0; i < txd.additional_pks.size(); ++i)
@@ -4885,7 +5098,7 @@ public:
             if (!generate_key_derivation(txd.additional_pks[i], prv_view_key, additional_derivations[i]))
             {
                 j_response["status"]  = "error";
-                j_response["message"] = "Cant calculate key_derivation";
+                j_response["message"] = "Can't calculate key_derivation";
                 return j_response;
             }
         }
@@ -4944,7 +5157,7 @@ public:
 
                     if (!r)
                     {
-                        cerr << "\nshow_my_outputs: Cant decode ringCT! " << endl;
+                        cerr << "\nshow_my_outputs: Can't decode ringCT! " << endl;
                     }
 
                     outp.second         = rct_amount;
@@ -5006,7 +5219,7 @@ public:
         catch (const boost::bad_lexical_cast& e)
         {
             j_data["title"] = fmt::format(
-                    "Cant parse page and/or limit numbers: {:s}", _limit);
+                    "Can't parse page and/or limit numbers: {:s}", _limit);
             return j_response;
         }
 
@@ -5033,7 +5246,7 @@ public:
         if (!xmreg::parse_str_address(address_str, address_info, nettype))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse Ryo address: " + address_str;
+            j_response["message"] = "Can't parse Ryo address: " + address_str;
             return j_response;
 
         }
@@ -5044,7 +5257,7 @@ public:
         if (!xmreg::parse_str_secret_key(viewkey_str, prv_view_key))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant parse view key: "
+            j_response["message"] = "Can't parse view key: "
                                     + viewkey_str;
             return j_response;
         }
@@ -5115,7 +5328,7 @@ public:
             if (!mcore->get_block_by_height(block_no, blk))
             {
                 j_response["status"] = "error";
-                j_response["message"] = fmt::format("Cant get block: {:d}", block_no);
+                j_response["message"] = fmt::format("Can't get block: {:d}", block_no);
                 return j_response;
             }
 
@@ -5126,7 +5339,7 @@ public:
             if (!core_storage->get_transactions(blk.tx_hashes, blk_txs, missed_txs))
             {
                 j_response["status"] = "error";
-                j_response["message"] = fmt::format("Cant get transactions in block: {:d}", block_no);
+                j_response["message"] = fmt::format("Can't get transactions in block: {:d}", block_no);
                 return j_response;
             }
 
@@ -5182,7 +5395,7 @@ public:
         if (!get_monero_network_info(j_info))
         {
             j_response["status"]  = "error";
-            j_response["message"] = "Cant get Ryo network info";
+            j_response["message"] = "Can't get Ryo network info";
             return j_response;
         }
 
@@ -5282,7 +5495,7 @@ private:
     {
         string payment_id;
 
-        // decrypt encrypted payment id, as used in integreated addresses
+        // decrypt encrypted payment id, as used in integrated addresses
         crypto::hash8 decrypted_payment_id8 = txd.payment_id8;
 
         if (decrypted_payment_id8 != null_hash8)
@@ -5327,7 +5540,7 @@ private:
 
             if (!generate_key_derivation(txd.pk, prv_view_key, derivation))
             {
-                error_msg = "Cant calculate key_derivation";
+                error_msg = "Can't calculate key_derivation";
                 return false;
             }
 
@@ -5336,7 +5549,7 @@ private:
             {
                 if (!generate_key_derivation(txd.additional_pks[i], prv_view_key, additional_derivations[i]))
                 {
-                    error_msg = "Cant calculate key_derivation";
+                    error_msg = "Can't calculate key_derivation";
                     return false;
                 }
             }
@@ -5397,7 +5610,7 @@ private:
 
                         if (!r)
                         {
-                            error_msg = "Cant decode ringct for tx: "
+                            error_msg = "Can't decode ringct for tx: "
                                                     + pod_to_hex(txd.hash);
                             return false;
                         }
@@ -5468,7 +5681,7 @@ private:
 
         if (!mcore->get_tx(tx_hash, tx))
         {
-            cerr << "Cant get tx in blockchain: " << tx_hash
+            cerr << "Can't get tx in blockchain: " << tx_hash
                  << ". \n Check mempool now" << endl;
 
             vector<MempoolStatus::mempool_tx> found_txs;
@@ -5558,10 +5771,11 @@ private:
 
         if (tx_blk_found && !mcore->get_block_by_height(tx_blk_height, blk))
         {
-            cerr << "Cant get block: " << tx_blk_height << endl;
+            cerr << "Can't get block: " << tx_blk_height << endl;
         }
 
         string tx_blk_height_str {"N/A"};
+        bool is_mined = false;
 
         // tx age
         pair<string, string> age;
@@ -5576,6 +5790,8 @@ private:
             blk_timestamp = xmreg::timestamp_to_str_gm(blk.timestamp);
 
             tx_blk_height_str = std::to_string(tx_blk_height);
+
+            is_mined = true;
         }
 
         // payments id. both normal and encrypted (payment_id8)
@@ -5600,19 +5816,21 @@ private:
                 {"tx_prefix_hash"        , string{}},
                 {"tx_pub_key"            , pod_to_hex(txd.pk)},
                 {"blk_height"            , tx_blk_height_str},
+                {"is_mined"              , is_mined},
                 {"tx_blk_height"         , tx_blk_height},
                 {"tx_size"               , fmt::format("{:0.4f}", tx_size)},
-                {"tx_fee"                , xmreg::xmr_amount_to_str(txd.fee, "{:0.12f}", false)},
-                {"payed_for_kB"          , fmt::format("{:0.12f}", payed_for_kB)},
+                {"tx_fee"                , xmreg::xmr_amount_to_str(txd.fee, "{:0.9f}", false)},
+                {"payed_for_kB"          , fmt::format("{:0.9f}", payed_for_kB)},
                 {"tx_version"            , static_cast<uint64_t>(txd.version)},
                 {"blk_timestamp"         , blk_timestamp},
                 {"blk_timestamp_uint"    , blk.timestamp},
-                {"delta_time"            , age.first},
+                {"delta_time"            , age.first == "" ? "N/A" : age.first},
                 {"inputs_no"             , static_cast<uint64_t>(txd.input_key_imgs.size())},
                 {"has_inputs"            , !txd.input_key_imgs.empty()},
                 {"outputs_no"            , static_cast<uint64_t>(txd.output_pub_keys.size())},
                 {"has_payment_id"        , txd.payment_id  != null_hash},
                 {"has_payment_id8"       , txd.payment_id8 != null_hash8},
+                {"has_uniform_payment_id", txd.pID == 'u'},
                 {"confirmations"         , txd.no_confirmations},
                 {"payment_id"            , pid_str},
                 {"payment_id_as_ascii"   , remove_bad_chars(txd.payment_id_as_ascii)},
@@ -5798,10 +6016,10 @@ private:
 
                     if (!mcore->get_block_by_height(output_data.height, blk))
                     {
-                        cerr << "- cant get block of height: " << output_data.height << endl;
+                        cerr << "- can't get block of height: " << output_data.height << endl;
 
                         context["has_error"] = true;
-                        context["error_msg"] = fmt::format("- cant get block of height: {}",
+                        context["error_msg"] = fmt::format("- can't get block of height: {}",
                                                            output_data.height);
                     }
 
@@ -5814,10 +6032,10 @@ private:
 
                     if (!mcore->get_tx(tx_out_idx.first, mixin_tx))
                     {
-                        cerr << "Cant get tx: " << tx_out_idx.first << endl;
+                        cerr << "Can't get tx: " << tx_out_idx.first << endl;
 
                         context["has_error"] = true;
-                        context["error_msg"] = fmt::format("Cant get tx: {:s}", tx_out_idx.first);
+                        context["error_msg"] = fmt::format("Can't get tx: {:s}", tx_out_idx.first);
                     }
 
                     // mixin tx details
@@ -6091,6 +6309,14 @@ private:
             // mark it so that it represents that it has at least
             // one sub-address
             txd.pID = 's';
+        }
+        else
+        {
+            tx_extra_uniform_payment_id uniform_pid;
+            if(get_payment_id_from_tx_extra(tx.extra, uniform_pid))
+            {
+                txd.pID = 'u'; // uniform payment id
+            }
         }
 
         // get tx signatures for each input

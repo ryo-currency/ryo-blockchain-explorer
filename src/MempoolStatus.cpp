@@ -184,15 +184,27 @@ MempoolStatus::read_mempool()
         get_payment_id(tx, payment_id, payment_id8);
 
         if (payment_id != null_hash)
+        {
             last_tx.pID = 'l'; // legacy payment id
+        }
         else if (payment_id8 != null_hash8)
+        {
             last_tx.pID = 'e'; // encrypted payment id
+        }
         else if (!get_additional_tx_pub_keys_from_extra(tx).empty())
         {
             // if multioutput tx have additional public keys,
             // mark it so that it represents that it has at least
             // one sub-address
             last_tx.pID = 's';
+        }
+        else
+        {
+            tx_extra_uniform_payment_id uniform_pid;
+            if(get_payment_id_from_tx_extra(tx.extra, uniform_pid))
+            {
+                last_tx.pID = 'u'; // uniform payment id
+            }
         }
        // } // if (hex_to_pod(_tx_info.id_hash, mem_tx_hash))
 
