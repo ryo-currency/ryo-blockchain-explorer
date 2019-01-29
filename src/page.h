@@ -1269,7 +1269,7 @@ public:
         // initalise page tempate map with basic info about blockchain
         crypto::hash blk_pow_hash;
         m.lock();
-        get_block_longhash(blk, ctx, blk_pow_hash);
+        get_block_longhash(nettype, blk, ctx, blk_pow_hash);
         m.unlock();
         string blk_pow_hash_str = pod_to_hex(blk_pow_hash);
         uint64_t blk_difficulty = core_storage->get_db().get_block_difficulty(_blk_height);
