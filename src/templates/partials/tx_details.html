@@ -128,7 +128,12 @@
         <span>RingCT type</span>
       </div>
       <div class="pure-u-3-4 pure-u-md-4-5">
+        {{#is_bp}}
+        <span>{{rct_type}} (Bulletproof)</span>
+        {{/is_bp}}
+        {{^is_bp}}
         <span>{{rct_type}}</span>
+        {{/is_bp}}
       </div>
       
       <div class="pure-u-1-4 pure-u-md-1-5">

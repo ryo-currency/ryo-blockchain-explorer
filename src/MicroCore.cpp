@@ -81,6 +81,15 @@ MicroCore::get_core()
 }
 
 /**
+ * Get mempool
+ */
+tx_memory_pool&
+MicroCore::get_mempool()
+{
+    return m_mempool;
+}
+
+/**
  * Get block by its height
  *
  * returns true if success

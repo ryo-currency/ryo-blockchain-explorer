@@ -109,12 +109,29 @@ MempoolStatus::read_mempool()
 
     // get txs in the mempool
     std::vector<tx_info> mempool_tx_info;
+    std::vector<spent_key_image_info> pool_key_image_info;
 
-    if (!rpc.get_mempool(mempool_tx_info))
+    // get txpool from lmdb database instead of rpc call
+    if (!mcore->get_mempool().get_transactions_and_spent_keys_info(
+            mempool_tx_info,
+            pool_key_image_info))
     {
         cerr << "Getting mempool failed " << endl;
         return false;
     }
+
+    (void) pool_key_image_info;
+
+    // sort txpool txs
+
+    // mempool txs are not sorted base on their arrival time,
+    // so we sort it here.
+
+    std::sort(mempool_tx_info.begin(), mempool_tx_info.end(),
+              [](tx_info& t1, tx_info& t2)
+              {
+                  return t1.receive_time > t2.receive_time;
+              });
 
     // if dont have tx_blob member, construct tx
     // from json obtained from the rpc call
@@ -168,7 +185,7 @@ MempoolStatus::read_mempool()
         last_tx.mixin_no          = sum_data[2];
         last_tx.num_nonrct_inputs = sum_data[3];
 
-        last_tx.fee_str          = xmreg::xmr_amount_to_str(_tx_info.fee, "{:0.3f}", false);
+        last_tx.fee_str          = xmreg::xmr_amount_to_str(_tx_info.fee, "{:0.4f}", false);
         last_tx.payed_for_kB_str = fmt::format("{:0.4f}", payed_for_kB);
         last_tx.xmr_inputs_str   = xmreg::xmr_amount_to_str(last_tx.sum_inputs , "{:0.3f}");
         last_tx.xmr_outputs_str  = xmreg::xmr_amount_to_str(last_tx.sum_outputs, "{:0.3f}");

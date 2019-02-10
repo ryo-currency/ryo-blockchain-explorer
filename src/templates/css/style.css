@@ -135,7 +135,7 @@ textarea {
 
 @media (min-width: 1400px) {
     .container {
-	max-width: 1240px;
+	max-width: 1250px;
     }
     .search input[type=text] {
 	width: 700px;
@@ -149,8 +149,8 @@ textarea {
 }
 
 .table-header {
-    color: #fff;
-    background-color: #888;
+    color: #000;
+    background-color: #ddd;
     border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     margin-top: 20px;
@@ -159,13 +159,18 @@ textarea {
 }
 
 .table-subheader {
-    background-color: #e0e0e0;
+    background-color: #e5e5e5;
     color: #000;
     font-size: 0.8em;
     font-family: monospace, monospace;
     font-weight: 700;
     padding: .5em 1em;
 }
+
+.pure-table thead {
+    background-color: #e5e5e5;
+}
+
 
 .table-footer {
     color: #000;
@@ -175,7 +180,7 @@ textarea {
 }
 
 .table-scroller {
-    border: 1px solid #888;
+    border: 1px solid #ddd;
     overflow-x:auto;
     -ms-overflow-style: none;
     -webkit-overflow-scrolling: touch;

@@ -30,7 +30,11 @@
 #include <limits>
 #include <ctime>
 #include <future>
+#include <mutex>
+#include <visitor/render_node.hpp>
 
+cn_pow_hash_v2 ctx;
+std::mutex m;
 
 #define TMPL_DIR                    "./templates"
 #define TMPL_PARIALS_DIR            TMPL_DIR "/partials"
@@ -68,7 +72,7 @@
 #define JS_SHA3     TMPL_DIR "/js/sha3.js"
 
 #define ONIONEXPLORER_RPC_VERSION_MAJOR 1
-#define ONIONEXPLORER_RPC_VERSION_MINOR 0
+#define ONIONEXPLORER_RPC_VERSION_MINOR 1
 #define MAKE_ONIONEXPLORER_RPC_VERSION(major,minor) (((major)<<16)|(minor))
 #define ONIONEXPLORER_RPC_VERSION \
     MAKE_ONIONEXPLORER_RPC_VERSION(ONIONEXPLORER_RPC_VERSION_MAJOR, ONIONEXPLORER_RPC_VERSION_MINOR)
@@ -112,6 +116,68 @@ namespace std
             return h1 ^ (h2 << 1);
         };
     };
+}
+
+/**
+ * visitor to produce json representations of
+ * values stored in mstch::node
+ */
+class mstch_node_to_json: public boost::static_visitor<nlohmann::json> {
+public:
+
+    // enabled for numeric types
+    template<typename T>
+        std::enable_if_t<std::is_arithmetic<T>::value, nlohmann::json>
+        operator()(T const& value) const {
+        return nlohmann::json {value};
+    }
+
+    nlohmann::json operator()(std::string const& value) const {
+        return nlohmann::json {value};
+    }
+
+    nlohmann::json operator()(mstch::map const& n_map) const
+    {
+        nlohmann::json j;
+
+        for (auto const& kv: n_map)
+            j[kv.first] = boost::apply_visitor(mstch_node_to_json(), kv.second);
+
+        return j;
+    }
+
+    nlohmann::json operator()(mstch::array const& n_array) const
+    {
+        nlohmann::json j;
+
+        for (auto const& v:  n_array)
+            j.push_back(boost::apply_visitor(mstch_node_to_json(), v));
+
+        return j;
+
+    }
+
+    // catch other types that are non-numeric and not listed above
+    template<typename T>
+        std::enable_if_t<!std::is_arithmetic<T>::value, nlohmann::json>
+        operator()(const T&) const {
+        return nlohmann::json {};
+    }
+
+};
+
+namespace mstch
+{
+    namespace internal
+    {
+        // add conversion from mstch::map to nlohmann::json
+        void
+            to_json(nlohmann::json& j, mstch::map const &m)
+        {
+            for (auto const& kv: m)
+                j[kv.first] = boost::apply_visitor(mstch_node_to_json(), kv.second);
+        }
+    }
 }
 
 
@@ -191,8 +257,8 @@ struct tx_details
 
             mixin_str        = std::to_string(mixin_no);
             fee_str          = fmt::format("{:0.6f}", xmr_amount);
-            fee_short_str    = fmt::format("{:0.3f}", xmr_amount);
-            payed_for_kB_str = fmt::format("{:0.3f}", payed_for_kB);
+            fee_short_str    = fmt::format("{:0.4f}", xmr_amount);
+            payed_for_kB_str = fmt::format("{:0.4f}", payed_for_kB);
         }
 
 
@@ -519,12 +585,12 @@ public:
 
         uint64_t local_copy_server_timestamp = server_timestamp;
 
-        // number of last blocks to show
-        uint64_t no_of_last_blocks {no_blocks_on_index + 1};
-
         // get the current blockchain height. Just to check
         uint64_t height = core_storage->get_current_blockchain_height();
         string height_human = fmt::format("{:n}", height);
+
+        // number of last blocks to show
+        uint64_t no_of_last_blocks = std::min(no_blocks_on_index + 1, height);
 
         // initalise page tempate map with basic info about blockchain
         mstch::map context {
@@ -753,8 +819,9 @@ public:
                     txd_map.insert({"height"    , i});
                     txd_map.insert({"blk_hash"  , blk_hash_str});
                     txd_map.insert({"age"       , age.first});
-                    txd_map.insert({"is_ringct" , (tx.version > 1)});
+                    txd_map.insert({"is_ringct" , true});
                     txd_map.insert({"rct_type"  , tx.rct_signatures.type});
+                    txd_map.insert({"is_bp"     , tx.rct_signatures.type == rct::RCTTypeBulletproof});
                     txd_map.insert({"blk_size"  , blk_size_str});
 
 
@@ -823,14 +890,12 @@ public:
         // perapre network info mstch::map for the front page
         string hash_rate;
 
-        if (testnet || stagenet)
-        {
-            hash_rate = std::to_string(current_network_info.hash_rate) + " H/s";
-        }
-        else
-        {
+        if (current_network_info.hash_rate > 1e6)
             hash_rate = fmt::format("{:0.3f} MH/s", current_network_info.hash_rate/1.0e6);
-        }
+        else if (current_network_info.hash_rate > 1e3)
+            hash_rate = fmt::format("{:0.3f} kH/s", current_network_info.hash_rate/1.0e3);
+        else
+            hash_rate = fmt::format("{:d} H/s", current_network_info.hash_rate);
 
         pair<string, string> network_info_age = get_age(local_copy_server_timestamp,
                                                         current_network_info.info_timestamp);
@@ -1202,6 +1267,13 @@ public:
                                                  _blk_height, current_blockchain_height);
 
         // initalise page tempate map with basic info about blockchain
+        crypto::hash blk_pow_hash;
+        m.lock();
+        get_block_longhash(nettype, blk, ctx, blk_pow_hash);
+        m.unlock();
+        string blk_pow_hash_str = pod_to_hex(blk_pow_hash);
+        uint64_t blk_difficulty = core_storage->get_db().get_block_difficulty(_blk_height);
+
         mstch::map context {
                 {"testnet"              , testnet},
                 {"stagenet"             , stagenet},
@@ -1219,6 +1291,8 @@ public:
                 {"blk_age"              , age.first},
                 {"delta_time"           , delta_time},
                 {"blk_nonce"            , blk.nonce},
+                {"blk_pow_hash"         , blk_pow_hash_str},
+                {"blk_difficulty"       , blk_difficulty},
                 {"age_format"           , age.second},
                 {"major_ver"            , std::to_string(blk.major_version)},
                 {"minor_ver"            , std::to_string(blk.minor_version)},
@@ -2004,6 +2078,12 @@ public:
         // parefct matches must be equal to number of inputs in a tx.
         uint64_t no_of_matched_mixins {0};
 
+        // Hold all possible mixins that we found. This is only used so that
+        // we get number of all possibilities, and their total ryo amount
+        // (useful for unit testing)
+        //                        public_key    , amount
+        std::vector<std::pair<crypto::public_key, uint64_t>> all_possible_mixins;
+
         for (const txin_to_key& in_key: input_key_imgs)
         {
 
@@ -2178,14 +2258,16 @@ public:
                 mstch::node& has_found_outputs
                         = boost::get<mstch::map>(mixin_outputs.back())["has_found_outputs"];
 
+                uint64_t ringct_amount {0};
+
                 // for each output in mixin tx, find the one from key_image
                 // and check if it's ours.
                 for (const auto& mix_out: output_pub_keys)
                 {
 
-                    txout_to_key txout_k      = std::get<0>(mix_out);
-                    uint64_t amount           = std::get<1>(mix_out);
-                    uint64_t output_idx_in_tx = std::get<2>(mix_out);
+                    txout_to_key const& txout_k = std::get<0>(mix_out);
+                    uint64_t amount             = std::get<1>(mix_out);
+                    uint64_t output_idx_in_tx   = std::get<2>(mix_out);
 
                     //cout << " - " << pod_to_hex(txout_k.key) << endl;
 
@@ -2293,6 +2375,7 @@ public:
                             // for regular/old txs there must be also a match
                             // in amounts, not only in output public keys
                             sum_mixin_xmr += amount;
+                            ringct_amount += amount;
                             no_of_matched_mixins++;
                         }
 
@@ -2328,6 +2411,11 @@ public:
 
                 has_mixin_outputs = found_something;
 
+                if (found_something)
+                    all_possible_mixins.push_back(
+                        {mixin_tx_pub_key,
+                                in_key.amount == 0 ? ringct_amount : in_key.amount});
+
                 ++count;
 
             } // for (const cryptonote::output_data_t& output_data: mixin_outputs)
@@ -2351,6 +2439,17 @@ public:
 
 
         uint64_t possible_spending  {0};
+
+        // useful for unit testing as it provides total ryo sum
+        // of possible mixins
+        uint64_t all_possible_mixins_amount1  {0};
+
+        for (auto& p: all_possible_mixins)
+            all_possible_mixins_amount1 += p.second;
+
+        context["no_all_possible_mixins"] = static_cast<uint64_t>(all_possible_mixins.size());
+        context["all_possible_mixins_amount"] = xmreg::xmr_amount_to_str(
+            all_possible_mixins_amount1, "{:0.9f}", false);
 
         // show spending only if sum of mixins is more than
         // what we get + fee, and number of perferctly matched
@@ -4440,6 +4539,55 @@ public:
         return j_response;
     }
 
+    json
+    json_detailedtransaction(string tx_hash_str)
+    {
+        json j_response {
+            {"status", "fail"},
+            {"data"  , json {}}
+        };
+
+        json& j_data = j_response["data"];
+
+        transaction tx;
+
+        bool found_in_mempool {false};
+        uint64_t tx_timestamp {0};
+        string error_message;
+
+        if (!find_tx_for_json(tx_hash_str, tx, found_in_mempool, tx_timestamp, error_message))
+        {
+            j_data["title"] = error_message;
+            return j_response;
+        }
+
+        // get detailed tx information
+        mstch::map tx_context = construct_tx_context(tx, 1 /*full detailed */);
+
+        // remove some page specific and html stuff
+        tx_context.erase("timescales");
+        tx_context.erase("tx_json");
+        tx_context.erase("tx_json_raw");
+        tx_context.erase("enable_mixins_details");
+        tx_context.erase("with_ring_signatures");
+        tx_context.erase("show_part_of_inputs");
+        tx_context.erase("show_more_details_link");
+        tx_context.erase("max_no_of_inputs_to_show");
+        tx_context.erase("inputs_xmr_sum_not_zero");
+        tx_context.erase("have_raw_tx");
+        tx_context.erase("have_any_unknown_amount");
+        tx_context.erase("has_error");
+        tx_context.erase("error_msg");
+        tx_context.erase("server_time");
+        tx_context.erase("construction_time");
+
+        j_data = tx_context;
+
+        j_response["status"] = "success";
+
+        return j_response;
+    }
+
     /*
      * Lets use this json api convention for success and error
      * https://labs.omniti.com/labs/jsend
@@ -5441,7 +5589,7 @@ public:
 
             string emission_blk_no   = std::to_string(current_values.blk_no - 1);
             string emission_coinbase = xmr_amount_to_str(current_values.coinbase, "{:0.3f}");
-            string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.3f}", false);
+            string emission_fee      = xmr_amount_to_str(current_values.fee, "{:0.4f}", false);
 
             j_data = json {
                     {"blk_no"  , current_values.blk_no - 1},
@@ -5839,8 +5987,9 @@ private:
                 {"with_ring_signatures"  , static_cast<bool>(
                                                    with_ring_signatures)},
                 {"tx_json"               , tx_json},
-                {"is_ringct"             , (tx.version > 1)},
+                {"is_ringct"             , true},
                 {"rct_type"              , tx.rct_signatures.type},
+                {"is_bp"                 , tx.rct_signatures.type == rct::RCTTypeBulletproof},
                 {"has_error"             , false},
                 {"error_msg"             , string("")},
                 {"have_raw_tx"           , false},
@@ -6368,6 +6517,31 @@ private:
         boost::erase_all(raw_tx_data, "-----END CERTIFICATE-----");
     }
 
+    bool
+    find_tx_for_json(
+        string const& tx_hash_str,
+        transaction& tx,
+        bool& found_in_mempool,
+        uint64_t& tx_timestamp,
+        string& error_message)
+    {
+        // parse tx hash string to hash object
+        crypto::hash tx_hash;
+
+        if (!xmreg::parse_str_secret_key(tx_hash_str, tx_hash))
+        {
+            error_message = fmt::format("Can't parse tx hash: {:s}", tx_hash_str);
+            return false;
+        }
+
+        if (!find_tx(tx_hash, tx, found_in_mempool, tx_timestamp))
+        {
+            error_message = fmt::format("Can't find tx hash: {:s}", tx_hash_str);
+            return false;
+        }
+
+        return true;
+    }
 
     bool
     search_mempool(crypto::hash tx_hash,
