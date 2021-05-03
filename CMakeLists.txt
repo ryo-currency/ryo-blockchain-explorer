@@ -51,6 +51,7 @@ find_package(Boost COMPONENTS
         serialization
         program_options
         date_time
+        locale
         REQUIRED)
 
 #info https://github.com/arsenm/sanitizers-cmake
@@ -71,6 +72,7 @@ endif()
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("ext/mstch/include")
 include_directories("ext/crow")
+include_directories(${MONERO_SOURCE_DIR}/external/fmt/include)
 
 # add ext/ subfolder
 add_subdirectory(ext/)
@@ -114,7 +116,6 @@ set(LIBRARIES
         device
         common
         mnemonics
-        easylogging
         checkpoints
         version
         epee
