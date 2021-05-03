@@ -5,6 +5,8 @@
 #ifndef XMREG01_TOOLS_H
 #define XMREG01_TOOLS_H
 
+#include <fmt/format.h>
+
 #define PATH_SEPARARTOR '/'
 
 #define XMR_AMOUNT(value) \
@@ -13,12 +15,8 @@
 #define REMOVE_HASH_BRAKETS(a_hash) \
     a_hash.substr(1, a_hash.size()-2)
 
-
-
 #include "monero_headers.h"
 
-#include "../ext/fmt/ostream.h"
-#include "../ext/fmt/format.h"
 #include "../ext/json.hpp"
 
 #include <boost/lexical_cast.hpp>
