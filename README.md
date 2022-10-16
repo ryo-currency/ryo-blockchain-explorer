@@ -77,6 +77,9 @@ Once the Ryo is compiled, the explorer can be downloaded and compiled
 as follows:
 
 ```bash
+# install explorer dependecines
+sudo apt install libasio-dev libcurl4-openssl-dev
+
 # go to home folder if still in ~/ryo-currency
 cd ~
 
