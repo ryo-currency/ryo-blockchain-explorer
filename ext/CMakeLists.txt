@@ -10,8 +10,8 @@ set(SOURCE_HEADERS
         fmt/format.h)
 
 set(SOURCE_FILES
-        fmt/format.cc
-        fmt/ostream.cc)
+        ${MONERO_SOURCE_DIR}/external/fmt/src/format.cc
+        ${MONERO_SOURCE_DIR}/external/fmt/src/posix.cc)
 
 # make static library called libmyxrm
 # that we are going to link to
