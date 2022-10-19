@@ -44,6 +44,7 @@ main(int ac, const char* av[])
     }
 
     auto port_opt                      = opts.get_option<string>("port");
+    auto bind_addr                     = opts.get_option<string>("bind-addr").get();
     auto bc_path_opt                   = opts.get_option<string>("bc-path");
     auto deamon_url_opt                = opts.get_option<string>("deamon-url");
     auto ssl_crt_file_opt              = opts.get_option<string>("ssl-crt-file");
@@ -779,13 +780,13 @@ main(int ac, const char* av[])
     if (use_ssl)
     {
         cout << "Staring in ssl mode" << endl;
-        app.port(app_port).ssl_file(ssl_crt_file, ssl_key_file)
+        app.bindaddr(bind_addr).port(app_port).ssl_file(ssl_crt_file, ssl_key_file)
                 .multithreaded().run();
     }
     else
     {
         cout << "Staring in non-ssl mode" << endl;
-        app.port(app_port).multithreaded().run();
+        app.bindaddr(bind_addr).port(app_port).multithreaded().run();
     }
 
 
