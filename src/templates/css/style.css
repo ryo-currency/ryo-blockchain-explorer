@@ -1092,7 +1092,7 @@ a.pure-button-selected {
 	font-size: inherit;
 	margin: 0;
 	overflow: visible;
-	padding: .5em 1em
+	padding: .5em .5em
 }
 
 .pure-table td:first-child,
