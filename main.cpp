@@ -515,6 +515,11 @@ main(int ac, const char* av[])
 //        return xmrblocks.altblocks();
 //    });
 
+    CROW_ROUTE(app, "/css/style.css")
+    ([&](const crow::request& req) {
+        return xmrblocks.get_js_file("css_styles");
+    });
+
     CROW_ROUTE(app, "/robots.txt")
     ([&]() {
         string text = "User-agent: *\n"
