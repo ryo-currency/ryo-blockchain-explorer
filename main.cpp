@@ -515,7 +515,7 @@ main(int ac, const char* av[])
 //        return xmrblocks.altblocks();
 //    });
 
-    CROW_ROUTE(app, "/css/style.css")
+    CROW_ROUTE(app, "/static/style.css")
     ([&](const crow::request& req) {
         return xmrblocks.get_js_file("css_styles");
     });

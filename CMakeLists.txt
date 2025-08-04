@@ -94,7 +94,7 @@ add_sanitizers(${PROJECT_NAME})
 create_git_version()
 
 configure_files(${CMAKE_CURRENT_SOURCE_DIR}/src/templates ${CMAKE_CURRENT_BINARY_DIR}/templates)
-configure_files(${CMAKE_CURRENT_SOURCE_DIR}/src/templates/css ${CMAKE_CURRENT_BINARY_DIR}/templates/css)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/templates/static DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/templates)
 configure_files(${CMAKE_CURRENT_SOURCE_DIR}/src/templates/partials ${CMAKE_CURRENT_BINARY_DIR}/templates/partials)
 configure_files(${CMAKE_CURRENT_SOURCE_DIR}/src/templates/js ${CMAKE_CURRENT_BINARY_DIR}/templates/js)
 
